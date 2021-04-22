@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "value": "hubasa1"
+    },
+    "adminUsername": {
+      "value": "answami"
+    },
+    "authenticationType": {
+      "value": "password"
+    },
+    "adminPassword": {
+      "value": "Cisco123"
+    },
+    "sshPublicKey": {
+      "value": "1"
+    },
+    "vmStorageAccount": {
+      "value": "hubasa1"
+    },
+    "virtualNetworkResourceGroup": {
+      "value": "srw-azure"
+    },
+    "virtualNetworkName": {
+      "value": "HubvNET"
+    },
+    "man00SubnetName": {
+      "value": "Hubmgmt"
+    },
+    "man00SubnetIP": {
+      "value": "10.82.0.10"
+    },
+    "gig00SubnetName": {
+      "value": "Huboutside"
+    },
+    "gig00SubnetIP": {
+      "value": "10.82.1.10"
+    },
+    "gig01SubnetName": {
+      "value": "Hubinside"
+    },
+    "gig01SubnetIP": {
+      "value": "10.82.2.10"
+    },
+    "gig02SubnetName": {
+      "value": "Hubdmz"
+    },
+    "gig02SubnetIP": {
+      "value": "10.82.3.10"
+    },
+    "VmSize": {
+      "value": "Standard_D3_v2"
+    }
+  }
+}
