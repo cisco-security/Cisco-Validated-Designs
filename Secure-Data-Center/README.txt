@@ -1,1 +1,0 @@
-August 7, 2019The https://github.com/cisco-security/Cisco-Validated-Design/Secure-Data-Center folder contains the configurations used for the validation. Refer to the Cisco Secure Data Center CVD here for more information, https://www.cisco.com/c/dam/en/us/solutions/collateral/design-zone/cisco-validated-profiles/secure-dc-design-guide-cvd.pdf
