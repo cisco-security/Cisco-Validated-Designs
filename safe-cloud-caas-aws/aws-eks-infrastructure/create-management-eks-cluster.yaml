@@ -1,0 +1,24 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: management-eks
+  region: <aws-region>
+
+vpc:
+  subnets:
+    private:
+      <aws-az-1>: { id: <subnet-id> }
+      <aws-az-2>: { id: <subnet-id> }
+
+iam:
+  withOIDC: true
+
+nodeGroups:
+  - name: mgmt-workers
+    labels: { role: mgmt }
+    instanceType: m5.large
+    desiredCapacity: 2
+    privateNetworking: true
+    ssh:
+      publicKeyName: <update-ec2-keyname-here>

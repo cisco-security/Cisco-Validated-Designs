@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-end
+  labels:
+    app.kubernetes.io/instance: WAAS
+    app.kubernetes.io/name: WAAS
+  namespace: sock-shop-prod
+spec:
+  selector:
+    matchLabels:
+      name: front-end
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: WAAS
+        app.kubernetes.io/name: WAAS
+        name: front-end
+    spec:
+      containers:
+      - name: enforcer
+        ports:
+          - name: stats
+            containerPort: 19010
+        command:
+        - /wrapper.sh
+        - -n=kwaf
+        - -m=waas-controller-service
+        - -p=sock-shop-prod/sock-shop-frontend
+        - -t=frontendEnforcer
+        - -e
+        - -c=19011:sockshopPolicy:127.0.0.1:8079
+        - -l=$HOSTNAME_access.log
+        - -f=$HOSTNAME_security.log
+        imagePullPolicy: IfNotPresent
+        image: 904585389016.dkr.ecr.us-east-2.amazonaws.com/radware/waas-bootstrap:1.4.0
+        env:
+        - name: ENFORCER_OPT_L
+          value: info
+        - name: ENFORCER_OPT_BASE_ID
+          value: "321"
+        volumeMounts:
+        - mountPath: /logs
+          name: logs-volume
+        readinessProbe:
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+          httpGet:
+            path: /
+            port: 19011
+            scheme: HTTP
+        livenessProbe:
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+          httpGet:
+            path: /
+            port: 19011
+            scheme: HTTP
+      - name: logrotate
+        image: 904585389016.dkr.ecr.us-east-2.amazonaws.com/radware/waas-logrotate:1.4.0
+        imagePullPolicy: IfNotPresent
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /logs
+      - name: fluentbit
+        image: 904585389016.dkr.ecr.us-east-2.amazonaws.com/radware/waas-fluentbit:1.4.0
+        imagePullPolicy: IfNotPresent
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        env:
+        - name: FB_LS_HOST
+          value : waas-logstash-service.kwaf.svc.cluster.local
+        - name: FB_PREFIX
+          value: front-end.sock-shop-prod
+        resources: {}
+        volumeMounts:
+        - name: securebeat-client-volume
+          mountPath: /etc/securebeat/client
+        - name: securebeat-ca-volume
+          mountPath: /etc/securebeat/ca
+        - name: logs-volume
+          mountPath: /logs
+      - name: front-end
+        image: weaveworksdemos/front-end:0.3.12
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8079
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+          readOnlyRootFilesystem: true
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      shareProcessNamespace: true
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: securebeat-ca-volume
+        configMap:
+          name: waas-securebeat-ca-config
+      - name: securebeat-client-volume
+        secret:
+          secretName: waas-securebeat-client-secret
+      - name: logs-volume
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-end
+  labels:
+    app.kubernetes.io/instance: WAAS
+    app.kubernetes.io/name: WAAS
+    waas-prometheus-service: monitor
+    name: front-end
+  namespace: sock-shop-prod
+spec:
+  ports:
+  - port: 80
+    targetPort: 19011
+  selector:
+    name: front-end

@@ -1,0 +1,118 @@
+Description:  This template provides first time Stealthwatch cloud integration with a single VPC. The integration happens in 3 steps.
+  1) Create an S3 bucket to store VPC flow logs.
+  2) Create an IAM role and associate IAM policies to it to allow Stealthwatch Cloud the permission to S3 bucket and other resources.
+  3) Copy the Cloudformation output(IAM Role ARN and S3 Bucket Name) and add it to Stealthwatch cloud portal.
+
+Parameters:
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: Select the VPC that you want to monitor using Stealthwatch cloud.
+
+  S3BucketName:
+    Type: String
+    Description: Name the S3 bucket to be created to store VPC flow logs.
+
+  ExternalID:
+    Type: String
+    Description: The Stealthwatch cloud Observable ID.
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref S3BucketName
+
+  VPCFlowLogDeliveryToS3:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      ResourceId: !Ref VPCID
+      ResourceType: VPC
+      TrafficType: ALL
+      LogDestination: !GetAtt S3Bucket.Arn
+      LogDestinationType: s3
+      LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status} ${vpc-id} ${subnet-id} ${instance-id} ${tcp-flags} ${type} ${pkt-srcaddr} ${pkt-dstaddr}'
+      MaxAggregationInterval: 60
+
+  ObservableRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: 'Obsrvble_role'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId:
+                  Ref: ExternalID
+            Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::757972810156:root"
+      Path: "/"
+
+  ObservablePolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: 'Obsrvble_policy'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "autoscaling:Describe*"
+              - "cloudtrail:LookupEvents"
+              - "cloudwatch:Get*"
+              - "cloudwatch:List*"
+              - "ec2:Describe*"
+              - "elasticache:Describe*"
+              - "elasticache:List*"
+              - "elasticloadbalancing:Describe*"
+              - "guardduty:Get*"
+              - "guardduty:List*"
+              - "iam:Get*"
+              - "iam:List*"
+              - "inspector:*"
+              - "rds:Describe*"
+              - "rds:List*"
+              - "redshift:Describe*"
+              - "workspaces:Describe*"
+              - "route53:List*"
+              - "logs:Describe*"
+              - "logs:GetLogEvents"
+              - "logs:FilterLogEvents"
+              - "logs:PutSubscriptionFilter"
+              - "logs:DeleteSubscriptionFilter"
+            Resource: '*'
+      Roles:
+          -
+            Ref: "ObservableRole"
+
+  Observables3Policy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: 'Obsrvble_s3policy'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - "s3:ListBucket"
+              - "s3:GetBucketLocation"
+            Resource: !GetAtt S3Bucket.Arn
+          - Effect: Allow
+            Action:
+              - "s3:GetObject"
+            Resource: !Join ["/", [!GetAtt S3Bucket.Arn, "*"]]
+      Roles:
+        -
+          Ref: "ObservableRole"
+
+Outputs:
+  ObservableRole:
+    Description: Stealthwatch Role ARN
+    Value: !GetAtt ObservableRole.Arn
+
+  S3Bucket:
+    Description: S3 Bucket Name
+    Value: !Ref S3Bucket

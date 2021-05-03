@@ -1,0 +1,25 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: staging-eks
+  region: <aws-region>
+
+iam:
+  withOIDC: true
+
+vpc:
+  subnets:
+    private:
+      <aws-az-1>: { id: <subnet-id> }
+      <aws-az-2>: { id: <subnet-id> }
+      <aws-az-3>: { id: <subnet-id> }
+
+nodeGroups:
+  - name: staging-workers
+    instanceType: m5.large
+    desiredCapacity: 3
+    volumeSize: 80
+    ssh:
+      allow: true
+      publicKeyName: <update-ec2-keyname-here>

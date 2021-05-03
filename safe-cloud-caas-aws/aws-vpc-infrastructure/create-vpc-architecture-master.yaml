@@ -1,0 +1,269 @@
+Description:  This template deploys the management, staging and production VPC, with public and private subnets spread across Availability Zones.
+  It also deploys an internet gateway, with a default route on the public subnets and NAT gateways (one in each AZ) with default routes in the private subnets.
+  It also deploys the VPC peering links connecting the VPCs.
+  Lastly, it deploys two bastion hosts in management VPC with preinstalled - AWSCLI, EKSCTL, KUBECTL, HELM and github
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+    Default: secure-cloudnative
+
+  S3CFMBucket:
+    Description: S3 Bucket name with CloudFormation templates
+    Type: "String"
+    AllowedPattern: "[a-z0-9-]*"
+    Default: safe-cloudnative-cvd
+
+  keyPairName:
+    Description: Key pair name (if there is no existing key pair then create one)
+    Type: String
+    Default: oregon
+
+  VpcMgmtCIDR:
+    Description: Please enter the IP range (CIDR notation) for management VPC
+    Type: String
+    Default: 10.10.0.0/16
+  VpcStageCIDR:
+    Description: Please enter the IP range (CIDR notation) for staging VPC
+    Type: String
+    Default: 10.20.0.0/16
+  VpcProdCIDR:
+    Description: Please enter the IP range (CIDR notation) for production VPC
+    Type: String
+    Default: 10.30.0.0/16
+
+  PublicSubnetmgmt1CIDR:
+    Description: Please enter the public subnet in the first Availability Zone in management VPC
+    Type: String
+    Default: 10.10.10.0/24
+  PublicSubnetmgmt2CIDR:
+    Description: Please enter the public subnet in the second Availability Zone in management VPC
+    Type: String
+    Default: 10.10.11.0/24
+  PrivateSubnetmgmt1CIDR:
+    Description: Please enter the private subnet in the first Availability Zone in management VPC
+    Type: String
+    Default: 10.10.20.0/24
+  PrivateSubnetmgmt2CIDR:
+    Description: Please enter the the private subnet in the second Availability Zone in management VPC
+    Type: String
+    Default: 10.10.21.0/24
+
+  PublicSubnetstage1CIDR:
+    Description: Please enter the public subnet in the first Availability Zone in stage VPC
+    Type: String
+    Default: 10.20.10.0/24
+  PublicSubnetstage2CIDR:
+    Description: Please enter the public subnet in the second Availability Zone in stage VPC
+    Type: String
+    Default: 10.20.11.0/24
+  PublicSubnetstage3CIDR:
+    Description: Please enter the public subnet in the third Availability Zone in stage VPC
+    Type: String
+    Default: 10.20.12.0/24
+  PrivateSubnetstage1CIDR:
+    Description: Please enter the private subnet in the first Availability Zone in stage VPC
+    Type: String
+    Default: 10.20.20.0/24
+  PrivateSubnetstage2CIDR:
+    Description: Please enter the private subnet in the second Availability Zone in stage VPC
+    Type: String
+    Default: 10.20.21.0/24
+  PrivateSubnetstage3CIDR:
+    Description: Please enter the the private subnet in the third Availability Zone in stage VPC
+    Type: String
+    Default: 10.20.22.0/24
+
+  PublicSubnetprod1CIDR:
+    Description: Please enter the public subnet in the first Availability Zone in prod VPC
+    Type: String
+    Default: 10.30.10.0/24
+  PublicSubnetprod2CIDR:
+    Description: Please enter the public subnet in the second Availability Zone in prod VPC
+    Type: String
+    Default: 10.30.11.0/24
+  PublicSubnetprod3CIDR:
+    Description: Please enter the public subnet in the third Availability Zone in prod VPC
+    Type: String
+    Default: 10.30.12.0/24
+  PrivateSubnetprod1CIDR:
+    Description: Please enter the private subnet in the first Availability Zone in prod VPC
+    Type: String
+    Default: 10.30.20.0/24
+  PrivateSubnetprod2CIDR:
+    Description: Please enter the private subnet in the second Availability Zone in prod VPC
+    Type: String
+    Default: 10.30.21.0/24
+  PrivateSubnetprod3CIDR:
+    Description: Please enter the the private subnet in the third Availability Zone in prod VPC
+    Type: String
+    Default: 10.30.22.0/24
+
+Resources:
+  managementVPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join [ "/", [ "https://s3.amazonaws.com",!Ref S3CFMBucket,"create-management-vpc.yaml"] ]
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcCIDR: !Ref VpcMgmtCIDR
+        PublicSubnet1CIDR: !Ref PublicSubnetmgmt1CIDR
+        PublicSubnet2CIDR: !Ref PublicSubnetmgmt2CIDR
+        PrivateSubnet1CIDR: !Ref PrivateSubnetmgmt1CIDR
+        PrivateSubnet2CIDR: !Ref PrivateSubnetmgmt2CIDR
+
+  stagingVPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join [ "/", [ "https://s3.amazonaws.com",!Ref S3CFMBucket,"create-staging-vpc.yaml"] ]
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcCIDR: !Ref VpcStageCIDR
+        PublicSubnet1CIDR: !Ref PublicSubnetstage1CIDR
+        PublicSubnet2CIDR: !Ref PublicSubnetstage2CIDR
+        PublicSubnet3CIDR: !Ref PublicSubnetstage3CIDR
+        PrivateSubnet1CIDR: !Ref PrivateSubnetstage1CIDR
+        PrivateSubnet2CIDR: !Ref PrivateSubnetstage2CIDR
+        PrivateSubnet3CIDR: !Ref PrivateSubnetstage3CIDR
+
+  productionVPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join [ "/", [ "https://s3.amazonaws.com",!Ref S3CFMBucket,"create-production-vpc.yaml"] ]
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcCIDR: !Ref VpcProdCIDR
+        PublicSubnet1CIDR: !Ref PublicSubnetprod1CIDR
+        PublicSubnet2CIDR: !Ref PublicSubnetprod2CIDR
+        PublicSubnet3CIDR: !Ref PublicSubnetprod3CIDR
+        PrivateSubnet1CIDR: !Ref PrivateSubnetprod1CIDR
+        PrivateSubnet2CIDR: !Ref PrivateSubnetprod2CIDR
+        PrivateSubnet3CIDR: !Ref PrivateSubnetprod3CIDR
+
+  bastionHosts:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: [managementVPC]
+    Properties:
+      TemplateURL: !Join [ "/", [ "https://s3.amazonaws.com",!Ref S3CFMBucket,"create-bastion-hosts.yaml"] ]
+      Parameters:
+        vpcName: !GetAtt managementVPC.Outputs.VPC
+        keyPairName: !Ref keyPairName
+        publicMgmtSubnet1: !GetAtt managementVPC.Outputs.PublicSubnet1
+        publicMgmtSubnet2: !GetAtt managementVPC.Outputs.PublicSubnet2
+
+  peeringManagementStagingVPC:
+      Type: AWS::EC2::VPCPeeringConnection
+      DependsOn: [managementVPC, stagingVPC]
+      Properties:
+        VpcId: !GetAtt managementVPC.Outputs.VPC
+        PeerVpcId: !GetAtt stagingVPC.Outputs.VPC
+
+  peeringManagementProductionVPC:
+      Type: 'AWS::EC2::VPCPeeringConnection'
+      DependsOn: [managementVPC, productionVPC]
+      Properties:
+        VpcId: !GetAtt managementVPC.Outputs.VPC
+        PeerVpcId: !GetAtt productionVPC.Outputs.VPC
+
+  peerRouteMgmtVPC1:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementStagingVPC]
+    Properties:
+      RouteTableId: !GetAtt managementVPC.Outputs.PrivateRouteTable1
+      DestinationCidrBlock: 10.20.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementStagingVPC
+  peerRouteMgmtVPC2:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementStagingVPC]
+    Properties:
+      RouteTableId: !GetAtt managementVPC.Outputs.PrivateRouteTable2
+      DestinationCidrBlock: 10.20.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementStagingVPC
+  peerRouteMgmtVPC3:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementStagingVPC]
+    Properties:
+      RouteTableId: !GetAtt managementVPC.Outputs.PublicRouteTable
+      DestinationCidrBlock: 10.20.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementStagingVPC
+
+  peerRouteMgmtVPC4:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementProductionVPC]
+    Properties:
+      RouteTableId: !GetAtt managementVPC.Outputs.PrivateRouteTable1
+      DestinationCidrBlock: 10.30.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementProductionVPC
+  peerRouteMgmtVPC5:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementProductionVPC]
+    Properties:
+      RouteTableId: !GetAtt managementVPC.Outputs.PrivateRouteTable2
+      DestinationCidrBlock: 10.30.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementProductionVPC
+  peerRouteMgmtVPC6:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementProductionVPC]
+    Properties:
+      RouteTableId: !GetAtt managementVPC.Outputs.PublicRouteTable
+      DestinationCidrBlock: 10.30.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementProductionVPC
+
+  peerRouteStageVPC1:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementStagingVPC]
+    Properties:
+      RouteTableId: !GetAtt stagingVPC.Outputs.PrivateRouteTable1
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementStagingVPC
+  peerRouteStageVPC2:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementStagingVPC]
+    Properties:
+      RouteTableId: !GetAtt stagingVPC.Outputs.PrivateRouteTable2
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementStagingVPC
+  peerRouteStageVPC3:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementStagingVPC]
+    Properties:
+      RouteTableId: !GetAtt stagingVPC.Outputs.PrivateRouteTable3
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementStagingVPC
+  peerRouteMgmtVPC4:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementStagingVPC]
+    Properties:
+      RouteTableId: !GetAtt stagingVPC.Outputs.PublicRouteTable
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementStagingVPC
+
+  peerRouteStageVPC5:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementProductionVPC]
+    Properties:
+      RouteTableId: !GetAtt productionVPC.Outputs.PrivateRouteTable1
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementProductionVPC
+  peerRouteStageVPC6:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementProductionVPC]
+    Properties:
+      RouteTableId: !GetAtt productionVPC.Outputs.PrivateRouteTable2
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementProductionVPC
+  peerRouteStageVPC7:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementProductionVPC]
+    Properties:
+      RouteTableId: !GetAtt productionVPC.Outputs.PrivateRouteTable3
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementProductionVPC
+  peerRouteMgmtVPC8:
+    Type: AWS::EC2::Route
+    DependsOn: [peeringManagementProductionVPC]
+    Properties:
+      RouteTableId: !GetAtt productionVPC.Outputs.PublicRouteTable
+      DestinationCidrBlock: 10.10.0.0/16
+      VpcPeeringConnectionId: !Ref peeringManagementProductionVPC
