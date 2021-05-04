@@ -1,5 +1,5 @@
 # AWS EKS Infrastructure
-![alt text](https://github.com/amansin0504/aws-cloudnative-cvd/blob/main/aws-eks-infrastructure/Images/AWS-Infra.png)
+![alt text](https://github.com/cisco-security/Cisco-Validated-Designs/blob/master/safe-cloud-caas-aws/aws-eks-infrastructure/images/AWS-Infra.png)
 
 ## Pre-Requisites:
 These configuration files provision EKS clusters in existing VPC infrastructure. Refer to the aws-vpc-infrastructure directory within this repo to provision the required VPC resources before creating the EKS clusters.
