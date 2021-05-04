@@ -1,7 +1,8 @@
 Description:  This template provides first time Stealthwatch cloud integration with a single VPC. The integration happens in 3 steps.
   1) Create an S3 bucket to store VPC flow logs.
-  2) Create an IAM role and associate IAM policies to it to allow Stealthwatch Cloud the permission to S3 bucket and other resources.
-  3) Copy the Cloudformation output(IAM Role ARN and S3 Bucket Name) and add it to Stealthwatch cloud portal.
+  2) Enable VPC flow logs delivery on a provided AWS VPC
+  3) Create an IAM role and associate IAM policies to it to allow Stealthwatch Cloud the permission to S3 bucket and other resources.
+  4) Copy the Cloudformation output(IAM Role ARN and S3 Bucket Name) and add it to Stealthwatch cloud portal.
 
 Parameters:
   VPCID:
