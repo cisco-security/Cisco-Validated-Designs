@@ -16,6 +16,8 @@ The processes above are called _stacks_. So, each time a resource is created, it
 
 This guide will break down how we achieved this setup and how it works. As we get to a new portion of the file, we will go over how we share resources within files, how they are called, and what is happening.
 
+For any clarification on AWS resources or what is supported, you may reference the AWS cloudformation guide: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
+
 # What will be created with this setup?
 
 With these configuration files, we will be building out a 3-tiered architecture setup using a nested stack setup. The architecture will look like so:
