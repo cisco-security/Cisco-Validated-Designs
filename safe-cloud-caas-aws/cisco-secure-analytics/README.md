@@ -1,9 +1,6 @@
 # Cisco Stealthwatch Cloud integration with AWS
-CloudFormation template for integrating Stealthwatch cloud with AWS.
+CloudFormation template for integrating Stealthwatch cloud with AWS VPCs.
 
-# Authors
-Modules are maintained by Amandeep Singh (amansin3@cisco.com)
-
-# Disclaimer
-This template is not an officially supported Cisco product. For official Cisco Stealthwatch cloud documentation visit the [page](https://www.cisco.com/c/en/us/products/security/stealthwatch-cloud/index.html).
-
+# Sample CloudFormation Run  
+![alt text](https://github.com/cisco-security/Cisco-Validated-Designs/blob/master/safe-cloud-caas-aws/cisco-secure-analytics/images/step1.png)  
+![alt text](https://github.com/cisco-security/Cisco-Validated-Designs/blob/master/safe-cloud-caas-aws/cisco-secure-analytics/images/step2.png)  
