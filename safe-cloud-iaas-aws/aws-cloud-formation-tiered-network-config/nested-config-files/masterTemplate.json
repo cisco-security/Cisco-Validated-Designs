@@ -1,0 +1,436 @@
+{
+  "Description": "master stack template.  gets all parameters and then calls subsequent stacks to be created.",
+  "Mappings": {
+    "RegionMap": {
+      "us-east-1": { "HVM": "ami-00e87074e52e6c9f9" },
+      "us-west-1": { "HVM": "ami-0bdb828fd58c52235" },
+      "us-east-2": { "HVM": "ami-00f8e2c955f7ffa9b" },
+      "us-west-2": { "HVM": "ami-0686851c4e7b1a8e1" },
+      "eu-central-1": { "HVM": "ami-08b6d44b4f6f7b279" },
+      "eu-west-1": { "HVM": "ami-08d2d8b00f270d03b" },
+      "ap-southeast-1": { "HVM": "ami-0adfdaea54d40922b" },
+      "ap-northeast-1": { "HVM": "ami-0ddea5e0f69c193a4" }
+    }
+  },
+  "Parameters": {
+    "route53DNS": {
+      "Default": "test-web-app.com",
+      "Description": "This will be the name of the website address",
+      "Type": "String"
+    },
+    "CidrBlock": {
+      "AllowedPattern": "((\\d{1,3})\\.){3}\\d{1,3}/\\d{1,2}",
+      "Default": "10.0.0.0/16",
+      "Description": "VPC CIDR Block (eg 10.0.0.0/16)",
+      "Type": "String"
+    },
+    "AvailabilityZone1": {
+      "Description": "The AvailabilityZone to use for the first subnet",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "AvailabilityZone2": {
+      "Description": "The AvailabilityZone to use for the second subnet",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "OutsideNetA": {
+      "AllowedPattern": "((\\d{1,3})\\.){3}\\d{1,3}/\\d{1,2}",
+      "Default": "10.0.1.0/24",
+      "Description": "VPC CIDR Block for the Public Subnet (eg 10.0.0.0/24)",
+      "Type": "String"
+    },
+    "OutsideNetB": {
+      "AllowedPattern": "((\\d{1,3})\\.){3}\\d{1,3}/\\d{1,2}",
+      "Default": "10.0.2.0/24",
+      "Description": "VPC CIDR Block for the Public Subnet 2 (eg 10.0.0.0/24)",
+      "Type": "String"
+    },
+    "InsideNetA": {
+      "AllowedPattern": "((\\d{1,3})\\.){3}\\d{1,3}/\\d{1,2}",
+      "Default": "10.0.3.0/24",
+      "Description": "VPC CIDR Block for the Internal Subnet (eg 10.0.0.0/24)",
+      "Type": "String"
+    },
+    "InsideNetB": {
+      "AllowedPattern": "((\\d{1,3})\\.){3}\\d{1,3}/\\d{1,2}",
+      "Default": "10.0.4.0/24",
+      "Description": "VPC CIDR Block for the Internal Subnet 2 (eg 10.0.0.0/24)",
+      "Type": "String"
+    },
+    "DBNetA": {
+      "AllowedPattern": "((\\d{1,3})\\.){3}\\d{1,3}/\\d{1,2}",
+      "Default": "10.0.5.0/24",
+      "Description": "VPC CIDR Block for the DB Subnet 1 (eg 10.0.0.0/24)",
+      "Type": "String"
+    },
+    "BDNetB": {
+      "AllowedPattern": "((\\d{1,3})\\.){3}\\d{1,3}/\\d{1,2}",
+      "Default": "10.0.6.0/24",
+      "Description": "VPC CIDR Block for the DB Subnet 2 (eg 10.0.0.0/24)",
+      "Type": "String"
+    },
+    "DBInstanceID": {
+      "Default": "mydbinstance",
+      "Description": "My database instance",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "63",
+      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription": "Must begin with a letter and must not end with a hyphen or contain two consecutive hyphens."
+    },
+    "DBName": {
+      "Default": "WordPress",
+      "Description": "My database",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription": "Must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBInstanceClass": {
+      "Default": "db.m5.large",
+      "Description": "DB instance class",
+      "Type": "String",
+      "ConstraintDescription": "Must select a valid DB instance type."
+    },
+    "DBAllocatedStorage": {
+      "Default": "50",
+      "Description": "The size of the database (GiB)",
+      "Type": "Number",
+      "MinValue": "5",
+      "MaxValue": "1024",
+      "ConstraintDescription": "must be between 20 and 65536 GiB."
+    },
+    "DBUsername": {
+      "Description": "Username for MySQL database access",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBPassword": {
+      "NoEcho": "true",
+      "Description": "Password MySQL database access",
+      "Type": "String",
+      "MinLength": "8",
+      "MaxLength": "41",
+      "AllowedPattern": "[a-zA-Z0-9]*",
+      "ConstraintDescription": "must contain only alphanumeric characters."
+    },
+    "AppAMItype": {
+      "Description": "Instance type for app server",
+      "Type": "String",
+      "Default": "t2.micro",
+      "AllowedValues": [
+        "t1.micro",
+        "t2.nano",
+        "t2.micro",
+        "t2.small",
+        "t2.medium",
+        "t2.large",
+        "m1.small",
+        "m1.medium",
+        "m1.large",
+        "m1.xlarge",
+        "m2.xlarge",
+        "m2.2xlarge",
+        "m2.4xlarge",
+        "m3.medium",
+        "m3.large",
+        "m3.xlarge",
+        "m3.2xlarge",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "c1.medium",
+        "c1.xlarge",
+        "c3.large",
+        "c3.xlarge",
+        "c3.2xlarge",
+        "c3.4xlarge",
+        "c3.8xlarge",
+        "c4.large",
+        "c4.xlarge",
+        "c4.2xlarge",
+        "c4.4xlarge",
+        "c4.8xlarge",
+        "g2.2xlarge",
+        "g2.8xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "i2.xlarge",
+        "i2.2xlarge",
+        "i2.4xlarge",
+        "i2.8xlarge",
+        "d2.xlarge",
+        "d2.2xlarge",
+        "d2.4xlarge",
+        "d2.8xlarge",
+        "hi1.4xlarge",
+        "hs1.8xlarge",
+        "cr1.8xlarge",
+        "cc2.8xlarge",
+        "cg1.4xlarge"
+      ]
+    },
+    "WebAMItype": {
+      "Description": "Instance type for app server",
+      "Type": "String",
+      "Default": "t2.micro",
+      "AllowedValues": [
+        "t1.micro",
+        "t2.nano",
+        "t2.micro",
+        "t2.small",
+        "t2.medium",
+        "t2.large",
+        "m1.small",
+        "m1.medium",
+        "m1.large",
+        "m1.xlarge",
+        "m2.xlarge",
+        "m2.2xlarge",
+        "m2.4xlarge",
+        "m3.medium",
+        "m3.large",
+        "m3.xlarge",
+        "m3.2xlarge",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "c1.medium",
+        "c1.xlarge",
+        "c3.large",
+        "c3.xlarge",
+        "c3.2xlarge",
+        "c3.4xlarge",
+        "c3.8xlarge",
+        "c4.large",
+        "c4.xlarge",
+        "c4.2xlarge",
+        "c4.4xlarge",
+        "c4.8xlarge",
+        "g2.2xlarge",
+        "g2.8xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "i2.xlarge",
+        "i2.2xlarge",
+        "i2.4xlarge",
+        "i2.8xlarge",
+        "d2.xlarge",
+        "d2.2xlarge",
+        "d2.4xlarge",
+        "d2.8xlarge",
+        "hi1.4xlarge",
+        "hs1.8xlarge",
+        "cr1.8xlarge",
+        "cc2.8xlarge",
+        "cg1.4xlarge"
+      ]
+    },
+
+    "appKeyName": {
+      "Description": "EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "webKeyName": {
+      "Description": "EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "S3BucketName": {
+      "Type": "String",
+      "Description": "Name the S3 bucket to be created to store VPC flow logs.",
+      "AllowedPattern": "[a-z0-9-]*"
+    },
+    "ExternalID": {
+      "Type": "String",
+      "Description": "The Stealthwatch cloud Observable ID."
+    }
+  },
+  "Resources": {
+    "networkSetup": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "change-me-1-network-setup-s3-url",
+        "Parameters": {
+          "CidrBlock": { "Ref": "CidrBlock" },
+          "AvailabilityZone1": { "Ref": "AvailabilityZone1" },
+          "AvailabilityZone2": { "Ref": "AvailabilityZone2" },
+          "OutsideNetA": { "Ref": "OutsideNetA" },
+          "OutsideNetB": { "Ref": "OutsideNetB" },
+          "InsideNetA": { "Ref": "InsideNetA" },
+          "InsideNetB": { "Ref": "InsideNetB" },
+          "DBNetA": { "Ref": "DBNetA" }
+        }
+      }
+    },
+    "DBSetup": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": ["networkSetup"],
+      "Properties": {
+        "TemplateURL": "change-me-2-db-setup-s3-url",
+        "Parameters": {
+          "DBInstanceID": { "Ref": "DBInstanceID" },
+          "DBName": { "Ref": "DBName" },
+          "DBInstanceClass": { "Ref": "DBInstanceClass" },
+          "DBAllocatedStorage": { "Ref": "DBAllocatedStorage" },
+          "DBUsername": { "Ref": "DBUsername" },
+          "DBPassword": { "Ref": "DBPassword" },
+          "dbCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.dbSG"]
+          },
+          "DBCloudformationSubnetA": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.dbSubnetA"]
+          },
+          "DBCloudformationSubnetB": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.dbSubnetB"]
+          }
+        }
+      }
+    },
+    "SWCSetup": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": ["networkSetup"],
+      "Properties": {
+        "TemplateURL": "change-me-2-swc-setup-s3-url",
+        "Parameters": {
+          "VPCID": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.StackVPC"]
+          },
+          "S3BucketName": {
+            "Ref": "S3BucketName"
+          },
+          "ExternalID": {
+            "Ref": "ExternalID"
+          }
+        }
+      }
+    },
+    "appLaunchConfig": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": ["DBSetup"],
+      "Properties": {
+        "TemplateURL": "change-me-3-app-launch-config-s3-url",
+        "Parameters": {
+          "AppAMItype": { "Ref": "AppAMItype" },
+          "AppAMI": {
+            "Fn::FindInMap": ["RegionMap", { "Ref": "AWS::Region" }, "HVM"]
+          },
+          "appKeyName": { "Ref": "appKeyName" },
+          "appCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.appSG"]
+          },
+          "webCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.webSG"]
+          },
+          "DB": {
+            "Fn::GetAtt": ["DBSetup", "Outputs.dbEndpoint"]
+          },
+          "DBPassword": {
+            "Ref": "DBPassword"
+          },
+          "DBUsername": {
+            "Ref": "DBUsername"
+          }
+        }
+      }
+    },
+    "AppAsgLb": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": ["appLaunchConfig"],
+      "Properties": {
+        "TemplateURL": "change-me-4-app-asg-lb-s3-urln",
+        "Parameters": {
+          "appLaunchConfig": {
+            "Fn::GetAtt": ["appLaunchConfig", "Outputs.appLaunchConfig"]
+          },
+          "insideCloudformationSubnetA": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.insideSubnetA"]
+          },
+          "insideCloudformationSubnetB": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.insideSubnetB"]
+          },
+          "cloudformationVPC": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.StackVPC"]
+          },
+          "appCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.appSG"]
+          },
+          "webCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.webSG"]
+          },
+          "appLaunchConfigVersion": {
+            "Fn::GetAtt": ["appLaunchConfig", "Outputs.appLaunchConfigVersion"]
+          }
+        }
+      }
+    },
+    "webLaunchConfig": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": ["AppAsgLb"],
+      "Properties": {
+        "TemplateURL": "change-me-5-web-launch-config-s3-url",
+        "Parameters": {
+          "route53DNS": {
+            "Ref": "route53DNS"
+          },
+          "WebAMItype": { "Ref": "WebAMItype" },
+          "webAMI": {
+            "Fn::FindInMap": ["RegionMap", { "Ref": "AWS::Region" }, "HVM"]
+          },
+          "webKeyName": { "Ref": "webKeyName" },
+          "appCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.appSG"]
+          },
+          "webCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.webSG"]
+          },
+          "appALBDNS": {
+            "Fn::GetAtt": ["AppAsgLb", "Outputs.appLoadBalancerDNS"]
+          }
+        }
+      }
+    },
+    "WebAsgLb": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": ["webLaunchConfig"],
+      "Properties": {
+        "TemplateURL": "change-me-6-web-asg-lb-s3-url",
+        "Parameters": {
+          "webLaunchConfig": {
+            "Fn::GetAtt": ["webLaunchConfig", "Outputs.webLaunchConfig"]
+          },
+          "outsideCloudformationSubnetA": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.outsideSubnetA"]
+          },
+          "outsideCloudformationSubnetB": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.outsideSubnetB"]
+          },
+          "cloudformationVPC": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.StackVPC"]
+          },
+          "appCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.appSG"]
+          },
+          "webCloudformationSG": {
+            "Fn::GetAtt": ["networkSetup", "Outputs.webSG"]
+          },
+          "webLaunchConfigVersion": {
+            "Fn::GetAtt": ["webLaunchConfig", "Outputs.webLaunchConfigVersion"]
+          }
+        }
+      }
+    }
+  }
+}

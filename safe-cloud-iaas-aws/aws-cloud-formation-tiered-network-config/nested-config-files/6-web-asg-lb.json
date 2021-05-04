@@ -1,0 +1,118 @@
+{
+  "Description": "Setting up app auto-scaling groups and launch configs",
+  "Parameters": {
+    "appCloudformationSG": { "Type": "String" },
+    "webCloudformationSG": { "Type": "String" },
+    "webLaunchConfig": { "Type": "String" },
+    "outsideCloudformationSubnetA": { "Type": "String" },
+    "outsideCloudformationSubnetB": { "Type": "String" },
+    "cloudformationVPC": { "Type": "String" },
+    "webLaunchConfigVersion": { "Type": "String" }
+  },
+  "Resources": {
+    "webASG": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "TargetGroupARNs": [{ "Ref": "webTargetGroup" }],
+        "MinSize": "1",
+        "MaxSize": "2",
+        "DesiredCapacity": "1",
+        "LaunchTemplate": {
+          "LaunchTemplateId": {
+            "Ref": "webLaunchConfig"
+          },
+          "Version": { "Ref": "webLaunchConfigVersion" }
+        },
+        "VPCZoneIdentifier": [
+          { "Ref": "outsideCloudformationSubnetA" },
+          { "Ref": "outsideCloudformationSubnetB" }
+        ]
+      }
+    },
+    "webLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "Scheme": "internet-facing",
+        "IpAddressType": "ipv4",
+        "Name": "WebNLB",
+        "Type": "application",
+        "SecurityGroups": [{ "Ref": "webCloudformationSG" }],
+        "Subnets": [
+          { "Ref": "outsideCloudformationSubnetA" },
+          { "Ref": "outsideCloudformationSubnetB" }
+        ]
+      }
+    },
+    "webTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckPath": "/",
+        "HealthCheckPort": "80",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 3,
+        "HealthyThresholdCount": 3,
+        "Matcher": {
+          "HttpCode": "200-399"
+        },
+        "Name": "WebServerPool",
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 10,
+        "VpcId": { "Ref": "cloudformationVPC" }
+      }
+    },
+    "HTTPListenerRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "Properties": {
+        "Actions": [
+          {
+            "Type": "forward",
+            "TargetGroupArn": { "Ref": "webTargetGroup" }
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "source-ip",
+            "SourceIpConfig": { "Values": ["0.0.0.0/0"] }
+          }
+        ],
+        "ListenerArn": { "Ref": "HTTPlistener" },
+        "Priority": 1
+      }
+    },
+    "HTTPlistener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "DefaultActions": [
+          {
+            "Type": "forward",
+            "TargetGroupArn": { "Ref": "webTargetGroup" }
+          }
+        ],
+        "LoadBalancerArn": {
+          "Ref": "webLoadBalancer"
+        },
+        "Port": 80,
+        "Protocol": "HTTP"
+      }
+    }
+  },
+  "Outputs": {
+    "webLoadBalancer": {
+      "Description": "web Load Balancer",
+      "Value": { "Ref": "webLoadBalancer" },
+      "Export": {
+        "Name": { "Fn::Sub": "${AWS::StackName}-webLoadBalancer" }
+      }
+    },
+    "webASG": {
+      "Description": "web Auto-Scaling group",
+      "Value": { "Ref": "webASG" },
+      "Export": {
+        "Name": { "Fn::Sub": "${AWS::StackName}-webASG" }
+      }
+    }
+  }
+}

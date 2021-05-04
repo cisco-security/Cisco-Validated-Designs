@@ -1,0 +1,125 @@
+{
+  "Description": "Setting up app auto-scaling groups and launch configs",
+  "Parameters": {
+    "appCloudformationSG": { "Type": "String" },
+    "webCloudformationSG": { "Type": "String" },
+    "appLaunchConfig": { "Type": "String" },
+    "insideCloudformationSubnetA": { "Type": "String" },
+    "insideCloudformationSubnetB": { "Type": "String" },
+    "cloudformationVPC": { "Type": "String" },
+    "appLaunchConfigVersion": { "Type": "String" }
+  },
+  "Resources": {
+    "appASG": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "TargetGroupARNs": [{ "Ref": "appTargetGroup" }],
+        "MinSize": "1",
+        "MaxSize": "2",
+        "DesiredCapacity": "1",
+        "LaunchTemplate": {
+          "LaunchTemplateId": {
+            "Ref": "appLaunchConfig"
+          },
+          "Version": { "Ref": "appLaunchConfigVersion" }
+        },
+        "VPCZoneIdentifier": [
+          { "Ref": "insideCloudformationSubnetA" },
+          { "Ref": "insideCloudformationSubnetB" }
+        ]
+      }
+    },
+    "appLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "Scheme": "internal",
+        "IpAddressType": "ipv4",
+        "Name": "AppNLB",
+        "Type": "application",
+        "SecurityGroups": [{ "Ref": "appCloudformationSG" }],
+        "Subnets": [
+          { "Ref": "insideCloudformationSubnetA" },
+          { "Ref": "insideCloudformationSubnetB" }
+        ]
+      }
+    },
+    "appTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "HealthCheckEnabled": true,
+        "HealthCheckPath": "/",
+        "HealthCheckPort": "80",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 3,
+        "HealthyThresholdCount": 3,
+        "Matcher": {
+          "HttpCode": "200-399"
+        },
+        "Name": "AppServerPool",
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetType": "instance",
+        "UnhealthyThresholdCount": 10,
+        "VpcId": { "Ref": "cloudformationVPC" }
+      }
+    },
+    "HTTPListenerRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "Properties": {
+        "Actions": [
+          {
+            "Type": "forward",
+            "TargetGroupArn": { "Ref": "appTargetGroup" }
+          }
+        ],
+        "Conditions": [
+          {
+            "Field": "source-ip",
+            "SourceIpConfig": { "Values": ["0.0.0.0/0"] }
+          }
+        ],
+        "ListenerArn": { "Ref": "HTTPlistener" },
+        "Priority": 1
+      }
+    },
+    "HTTPlistener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "DefaultActions": [
+          {
+            "Type": "forward",
+            "TargetGroupArn": { "Ref": "appTargetGroup" }
+          }
+        ],
+        "LoadBalancerArn": {
+          "Ref": "appLoadBalancer"
+        },
+        "Port": 80,
+        "Protocol": "HTTP"
+      }
+    }
+  },
+  "Outputs": {
+    "appLoadBalancer": {
+      "Description": "App Load Balancer",
+      "Value": { "Ref": "appLoadBalancer" },
+      "Export": {
+        "Name": { "Fn::Sub": "${AWS::StackName}-appLoadBalancer" }
+      }
+    },
+    "appLoadBalancerDNS": {
+      "Description": "App Load Balancer",
+      "Value": { "Fn::GetAtt": ["appLoadBalancer", "DNSName"] },
+      "Export": {
+        "Name": { "Fn::Sub": "${AWS::StackName}-appLoadBalancerDNS" }
+      }
+    },
+    "appASG": {
+      "Description": "App Auto-Scaling group",
+      "Value": { "Ref": "appASG" },
+      "Export": {
+        "Name": { "Fn::Sub": "${AWS::StackName}-appASG" }
+      }
+    }
+  }
+}
