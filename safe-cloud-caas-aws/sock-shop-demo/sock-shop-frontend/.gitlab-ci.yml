@@ -3,8 +3,8 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   IMAGE_TAG: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
   KUBECONFIG: /etc/deploy/config
-  AWSREGION: us-east-2
-  EKSCLUSTERNAME: safe-eks
+  AWSREGION: <update-with-aws-region>
+  EKSCLUSTERNAME: staging-eks
   CLAIR_OUTPUT: High
 
 image: docker:latest
@@ -23,7 +23,7 @@ eslint:
     - npm init --yes
     - npm install -g eslint
   script:
-    - eslint -c .eslintrc.js server.js 
+    - eslint -c .eslintrc.js server.js
 
 docker-build:
   tags:
@@ -40,7 +40,7 @@ docker-build:
 
 security_scan:
   stage: test
-  image: 
+  image:
     name: aquasec/trivy:latest
     entrypoint: [""]
   services:
@@ -95,6 +95,3 @@ deploy_prod:
   script:
     - echo "There is no production environment"
   when: manual
-
-
-
