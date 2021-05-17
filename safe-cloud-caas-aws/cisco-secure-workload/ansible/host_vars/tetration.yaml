@@ -1,16 +1,16 @@
 ---
 # URL for the Tetration Dashboard
-tetration_url: "https://intgssopov.tetrationpreview.com"
+tetration_url: "https://update-tetration-url-here"
 
 # API Details - Create new token from Tetration Dashboard!
-api_key: "3e26a436703c433994590cd77f4e81b2"
-api_secret: "5b3dd8cd9d2e554e3d2a1c308f2f7a1151aa6c75"
+api_key: "<update-api-key-here>"
+api_secret: "<update-api-secret-here"
 
 # Set to true for production setups that use trusted certificates!
 validate_certs: true
 
 # specific details for the tetration app env
-app_scope_name: "INTGSSOPOV:SAFE_CLOUDNATIVE"
+app_scope_name: "<update-app-scope-name-here>"
 external_orchestrator_name_k8s: "staging-eks"
 k8s_namespace: "sock-shop"
 
