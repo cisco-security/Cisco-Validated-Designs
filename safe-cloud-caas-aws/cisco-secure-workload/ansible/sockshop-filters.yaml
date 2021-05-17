@@ -60,7 +60,7 @@
         api_secret: "{{ api_secret }}"
       app_scope_name: "{{ app_scope_name }}"
       state: present
-      name: elb-health-monitor
+      name: aws-vpc-subnet
       query:
         filters:
           - field: ip
@@ -81,6 +81,9 @@
           - field: ip
             type: subnet
             value: "{{K8S_API_IP_ADDRESSES}}"
+          - field: ip
+            type: subnet
+            value: "172.20.0.0/16"
         type: or
   - name: Sock Shop Tetration add ntp.ubuntu.com
     tetration_inventory_filter:
@@ -143,7 +146,7 @@
         filters:
           - field: ip
             type: subnet
-            value: "10.20.20.0/32"
+            value: "10.20.20.1/32"
           - field: ip
             type: subnet
             value: "10.20.21.1/32"
@@ -178,21 +181,6 @@
             type: subnet
             value: "52.94.224.0/20"
         type: or
-  - name: Sock Shop Tetration add vpc
-    tetration_inventory_filter:
-      provider:
-        server_endpoint: "{{ tetration_url }}"
-        api_key: "{{ api_key }}"
-        api_secret: "{{ api_secret }}"
-      app_scope_name: "{{ app_scope_name }}"
-      state: present
-      name: vpc
-      query:
-        filters:
-          - field: ip
-            type: subnet
-            value: "10.20.0.0/16"
-        type: and
   - name: Sock Shop Tetration add vpc-dns
     tetration_inventory_filter:
       provider:
@@ -288,6 +276,51 @@
           - field: user_orchestrator_system/namespace
             type: eq
             value: "sock-shop"
+        type: and
+  - name: Nginx Controller Namespace
+    tetration_inventory_filter:
+      provider:
+        server_endpoint: "{{ tetration_url }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+      app_scope_name: "{{ app_scope_name }}"
+      state: present
+      name: ingress-nginx
+      query:
+        filters:
+          - field: user_orchestrator_system/namespace
+            type: eq
+            value: "ingress-nginx"
+        type: and
+  - name: KWAF Namespace
+    tetration_inventory_filter:
+      provider:
+        server_endpoint: "{{ tetration_url }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+      app_scope_name: "{{ app_scope_name }}"
+      state: present
+      name: kwaf-ns
+      query:
+        filters:
+          - field: user_orchestrator_system/namespace
+            type: eq
+            value: "kwaf"
+        type: and
+  - name: Nginx Controller Pod
+    tetration_inventory_filter:
+      provider:
+        server_endpoint: "{{ tetration_url }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+      app_scope_name: "{{ app_scope_name }}"
+      state: present
+      name: ingress-nginx-controller
+      query:
+        filters:
+          - field: user_orchestrator_system/pod_name
+            type: eq
+            value: "ingress-nginx-controller"
         type: and
   - name: Sock Shop Tetration add carts
     tetration_inventory_filter:
