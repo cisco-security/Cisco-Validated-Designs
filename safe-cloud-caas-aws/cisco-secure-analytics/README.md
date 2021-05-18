@@ -1,5 +1,5 @@
 # Cisco Secure Cloud Analytics integration with AWS VPCs  
-This template provides first time Secure Cloud Analytics integration with a single AWS VPC. The integration happens in 3 steps.
+The template(aws-swc.template) provides first time Secure Cloud Analytics integration with a single AWS VPC. The integration happens in 3 steps.
   - Create an S3 bucket to store VPC flow logs  
   - Enable VPC flows logs on a given AWS VPC and deliver the flow logs to newly created S3 bucket  
   - Create an IAM role and associate IAM policies to it to allow Secure Cloud Analytics the permission to S3 bucket and other resources  
