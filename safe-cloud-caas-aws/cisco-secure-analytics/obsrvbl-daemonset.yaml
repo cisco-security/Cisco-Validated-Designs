@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: obsrvbl-ona
+spec:
+  selector:
+    matchLabels:
+      name: obsrvbl-ona
+  template:
+    metadata:
+      labels:
+        name: obsrvbl-ona
+    spec:
+      serviceAccountName: obsrvbl
+      hostNetwork: true
+      containers:
+        - name: ona
+          image: obsrvbl/ona:4.2
+          env:
+            - name: OBSRVBL_HOST
+              value: "https://sensor.ext.obsrvbl.com"
+            - name: OBSRVBL_SERVICE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: obsrvbl
+                  key: service_key
+            - name: OBSRVBL_KUBERNETES_WATCHER
+              value: "true"
+            - name: OBSRVBL_HOSTNAME_RESOLVER
+              value: "false"
+            - name: OBSRVBL_NOTIFICATION_PUBLISHER
+              value: "false"
+            - name: OBSRVBL_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name

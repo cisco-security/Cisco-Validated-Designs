@@ -27,7 +27,7 @@ spec:
         - /wrapper.sh
         - -n=kwaf
         - -m=waas-controller-service
-        - -p=sock-shop-prod/sock-shop-frontend
+        - -p=sock-shop/sock-shop-frontend
         - -t=frontendEnforcer
         - -e
         - -c=19011:sockshopPolicy:127.0.0.1:8079
