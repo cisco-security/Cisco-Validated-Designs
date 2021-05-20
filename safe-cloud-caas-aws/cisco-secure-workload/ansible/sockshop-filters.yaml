@@ -52,7 +52,7 @@
             type: subnet
             value: "{{K8S_CONTROL_PRIVATE_IP_ADDRESSES}}"
         type: or
-  - name: Sock Shop Tetration add elb-health-monitor
+  - name: Sock Shop Tetration add aws-vpc-monitor
     tetration_inventory_filter:
       provider:
         server_endpoint: "{{ tetration_url }}"
@@ -277,21 +277,6 @@
             type: eq
             value: "sock-shop"
         type: and
-  - name: Nginx Controller Namespace
-    tetration_inventory_filter:
-      provider:
-        server_endpoint: "{{ tetration_url }}"
-        api_key: "{{ api_key }}"
-        api_secret: "{{ api_secret }}"
-      app_scope_name: "{{ app_scope_name }}"
-      state: present
-      name: ingress-nginx
-      query:
-        filters:
-          - field: user_orchestrator_system/namespace
-            type: eq
-            value: "ingress-nginx"
-        type: and
   - name: KWAF Namespace
     tetration_inventory_filter:
       provider:
@@ -318,9 +303,9 @@
       name: ingress-nginx-controller
       query:
         filters:
-          - field: user_orchestrator_system/pod_name
+          - field: user_orchestrator_system/namespace
             type: eq
-            value: "ingress-nginx-controller"
+            value: "ingress-nginx"
         type: and
   - name: Sock Shop Tetration add carts
     tetration_inventory_filter:
@@ -466,7 +451,7 @@
             type: eq
             value: "{{ k8s_namespace }}"
         type: and
-  - name: Sock Shop Tetration add core-dns-svc
+  - name: Sock Shop Tetration add core-dns
     tetration_inventory_filter:
       provider:
         server_endpoint: "{{ tetration_url }}"
@@ -474,7 +459,7 @@
         api_secret: "{{ api_secret }}"
       app_scope_name: "{{ app_scope_name }}"
       state: present
-      name: core-dns-svc
+      name: core-dns
       query:
         filters:
           - field: user_orchestrator_k8s-app

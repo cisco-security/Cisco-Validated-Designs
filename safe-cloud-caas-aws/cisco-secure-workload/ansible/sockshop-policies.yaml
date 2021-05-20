@@ -17,7 +17,7 @@
         state: present
     register: application
 
-  - name: Add Policy k8s-control-plane-private to kube-nodes
+  - name: Add Policy kube-nodes to ingress-nginx-controller
     tetration_application_policy:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -25,16 +25,16 @@
           api_secret: "{{ api_secret }}"
         app_id: "{{ application.object.id }}"
         app_scope_id: "{{ application.object.app_scope_id }}"
-        provider_filter_name: kube-nodes
-        consumer_filter_name: k8s-control-plane-private
+        provider_filter_name: ingress-nginx-controller
+        consumer_filter_name: kube-nodes
         version: v0
         rank: DEFAULT
         policy_action: ALLOW
         priority: 100
         state: present
-    register: k8s_control_plane_private_kube_nodes_policy
+    register: kube_nodes_ingress_nginx_controller_policy
 
-  - name: Add Ports to k8s-control-plane-private to kube-nodes
+  - name: Add Ports to kube-nodes to ingress-nginx-controller
     tetration_application_policy_ports:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -42,19 +42,19 @@
           api_secret: "{{ api_secret }}"
         app_id: "{{ application.object.id if application.object else None }}"
         app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
-        policy_id: "{{ k8s_control_plane_private_kube_nodes_policy.object.id if k8s_control_plane_private_kube_nodes_policy else None }}"
+        policy_id: "{{ kube_nodes_ingress_nginx_controller_policy.object.id if kube_nodes_ingress_nginx_controller_policy else None }}"
         version: v0
         proto_name: TCP
         start_port: "{{ port }}"
         end_port: "{{ port }}"
         state: present
     loop:
-      - 10250
+      - 10254
     loop_control:
       loop_var: port
       label: "Adding port {{ port }} to Sock Shop Policy"
 
-  - name: Add Policy elb-health-monitor to kube-nodes
+  - name: Add Policy aws-vpc-subnet to kube-nodes
     tetration_application_policy:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -63,7 +63,7 @@
         app_id: "{{ application.object.id }}"
         app_scope_id: "{{ application.object.app_scope_id }}"
         provider_filter_name: kube-nodes
-        consumer_filter_name: elb-health-monitor
+        consumer_filter_name: aws-vpc-subnet
         version: v0
         rank: DEFAULT
         policy_action: ALLOW
@@ -71,7 +71,7 @@
         state: present
     register: elb_health_monitor_kube_nodes_policy
 
-  - name: Add Ports to elb-health-monitor to kube-nodes
+  - name: Add Ports to aws-vpc-subnet to kube-nodes
     tetration_application_policy_ports:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -82,14 +82,16 @@
         policy_id: "{{ elb_health_monitor_kube_nodes_policy.object.id if elb_health_monitor_kube_nodes_policy else None }}"
         version: v0
         proto_name: TCP
-        start_port: "{{ port }}"
-        end_port: "{{ port }}"
+        start_port: "{{ item.port1 }}"
+        end_port: "{{ item.port2 }}"
         state: present
     loop:
-      - "{{ELB_HEALTH_MONITOR_PORT}}"
+      - { port1: '10000', port2: '11000' }
+      - { port1: '30000', port2: '32767' }
     loop_control:
-      loop_var: port
-      label: "Adding port {{ port }} to Sock Shop Policy"
+      label: "Adding ports to Sock Shop Policy"
+    register: elb_health_monitor_kube_nodes_policy_ports
+    ignore_errors: yes
 
   - name: Add Policy kube-nodes to vpc-private-gws
     tetration_application_policy:
@@ -202,7 +204,7 @@
       loop_var: port
       label: "Adding port {{ port }} to Sock Shop Policy"
 
-  - name: Add Policy kube-nodes to k8s-control-plane-private
+  - name: Add Policy core-dns to k8s-api
     tetration_application_policy:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -210,16 +212,16 @@
           api_secret: "{{ api_secret }}"
         app_id: "{{ application.object.id }}"
         app_scope_id: "{{ application.object.app_scope_id }}"
-        provider_filter_name: k8s-control-plane-private
-        consumer_filter_name: kube-nodes
+        provider_filter_name: k8s-api
+        consumer_filter_name: core-dns
         version: v0
         rank: DEFAULT
         policy_action: ALLOW
         priority: 100
         state: present
-    register: kube_nodes_k8s_control_plane_private_policy
+    register: core_dns_k8s_api_policy
 
-  - name: Add Ports to kube-nodes to k8s-control-plane-private
+  - name: Add Ports to core-dns to k8s-api
     tetration_application_policy_ports:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -227,44 +229,7 @@
           api_secret: "{{ api_secret }}"
         app_id: "{{ application.object.id if application.object else None }}"
         app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
-        policy_id: "{{ kube_nodes_k8s_control_plane_private_policy.object.id if kube_nodes_k8s_control_plane_private_policy else None }}"
-        version: v0
-        proto_name: TCP
-        start_port: "{{ port }}"
-        end_port: "{{ port }}"
-        state: present
-    loop:
-      - 443
-    loop_control:
-      loop_var: port
-      label: "Adding port {{ port }} to Sock Shop Policy"
-
-  - name: Add Policy core-dns-svc to k8s-control-plane-private
-    tetration_application_policy:
-        provider:
-          server_endpoint: "{{ tetration_url }}"
-          api_key: "{{ api_key }}"
-          api_secret: "{{ api_secret }}"
-        app_id: "{{ application.object.id }}"
-        app_scope_id: "{{ application.object.app_scope_id }}"
-        provider_filter_name: k8s-control-plane-private
-        consumer_filter_name: core-dns-svc
-        version: v0
-        rank: DEFAULT
-        policy_action: ALLOW
-        priority: 100
-        state: present
-    register: core_dns_svc_k8s_control_plane_private_policy
-
-  - name: Add Ports to core-dns-svc to k8s-control-plane-private
-    tetration_application_policy_ports:
-        provider:
-          server_endpoint: "{{ tetration_url }}"
-          api_key: "{{ api_key }}"
-          api_secret: "{{ api_secret }}"
-        app_id: "{{ application.object.id if application.object else None }}"
-        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
-        policy_id: "{{ core_dns_svc_k8s_control_plane_private_policy.object.id if core_dns_svc_k8s_control_plane_private_policy else None }}"
+        policy_id: "{{ core_dns_k8s_api_policy.object.id if core_dns_k8s_api_policy else None }}"
         version: v0
         proto_name: TCP
         start_port: "{{ port }}"
@@ -345,7 +310,7 @@
         end_port: "{{ port }}"
         state: present
     loop:
-      - 8079
+      - 19011
     loop_control:
       loop_var: port
       label: "Adding port {{ port }} to Sock Shop Policy"
@@ -1186,7 +1151,7 @@
       loop_var: port
       label: "Adding port {{ port }} to Sock Shop Policy"
 
-  - name: Add Policy k8s-cluster to core-dns-svc
+  - name: Add Policy k8s-cluster to core-dns
     tetration_application_policy:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -1194,7 +1159,7 @@
           api_secret: "{{ api_secret }}"
         app_id: "{{ application.object.id }}"
         app_scope_id: "{{ application.object.app_scope_id }}"
-        provider_filter_name: core-dns-svc
+        provider_filter_name: core-dns
         consumer_filter_name: k8s-cluster
         version: v0
         rank: DEFAULT
@@ -1203,7 +1168,7 @@
         state: present
     register: k8s_cluster_core_dns_svc_policy
 
-  - name: Add Ports to k8s-cluster to core-dns-svc
+  - name: Add Ports to k8s-cluster to core-dns
     tetration_application_policy_ports:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -1225,7 +1190,7 @@
       loop_var: port
       label: "Adding port {{ port }} to Sock Shop Policy"
 
-  - name: Add Ports to k8s-cluster to core-dns-svc
+  - name: Add Ports to k8s-cluster to core-dns
     tetration_application_policy_ports:
         provider:
           server_endpoint: "{{ tetration_url }}"
@@ -1308,6 +1273,382 @@
         app_id: "{{ application.object.id if application.object else None }}"
         app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
         policy_id: "{{ kube_nodes_all_addresses_policy.object.id if kube_nodes_all_addresses_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 443
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy kwaf to all-addresses
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: all-addresses
+        consumer_filter_name: kwaf-ns
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: kwaf_ns_all_addresses_policy
+
+  - name: Add Ports to kwaf-ns to all-addresses
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ kwaf_ns_all_addresses_policy.object.id if kwaf_ns_all_addresses_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 443
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy sock-shop to k8s-api
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: k8s-api
+        consumer_filter_name: sock-shop
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: sock_shop_k8s_api_policy
+
+  - name: Add Ports to sock-shop to k8s-api
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ sock_shop_k8s_api_policy.object.id if sock_shop_k8s_api_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 443
+      - 4443
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy ingress-nginx-controller to k8s-api
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: k8s-api
+        consumer_filter_name: ingress-nginx-controller
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: ingress_nginx_controller_k8s_api_policy
+
+  - name: Add Ports to ingress-nginx-controller to k8s-api
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ ingress_nginx_controller_k8s_api_policy.object.id if ingress_nginx_controller_k8s_api_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 443
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy kwaf-ns to k8s-api
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: k8s-api
+        consumer_filter_name: kwaf-ns
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: kwaf_ns_k8s_api_policy
+
+  - name: Add Ports to kwaf-ns to k8s-api
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ kwaf_ns_k8s_api_policy.object.id if kwaf_ns_k8s_api_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 443
+      - 4443
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy ingress-nginx-controller to front-end
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: front-end
+        consumer_filter_name: ingress-nginx-controller
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: ingress_nginx_controller_front_end_policy
+
+  - name: Add Ports to ingress-nginx-controller to front-end
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ ingress_nginx_controller_front_end_policy.object.id if ingress_nginx_controller_front_end_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 8079
+      - 19011
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy all-addresses to front-end-svc
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: front-end-svc
+        consumer_filter_name: all-addresses
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: all_addresses_front_end_svc_policy
+
+  - name: Add Ports to all-addresses to front-end-svc
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ all_addresses_front_end_svc_policy.object.id if all_addresses_front_end_svc_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 80
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy all-addresses to ingress-nginx-controller
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: ingress-nginx-controller
+        consumer_filter_name: all-addresses
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: all_addresses_ingress_nginx_controller
+
+  - name: Add Ports to all-addresses to ingress-nginx-controller
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ all_addresses_ingress_nginx_controller.object.id if all_addresses_ingress_nginx_controller else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 80
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy k8s-api to kwaf-ns
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: kwaf-ns
+        consumer_filter_name: k8s-api
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: k8s_api_kwaf_ns_policy
+
+  - name: Add Ports to k8s-api to kwaf-ns
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ k8s_api_kwaf_ns_policy.object.id if k8s_api_kwaf_ns_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ item.port1 }}"
+        end_port: "{{ item.port2 }}"
+        state: present
+    loop:
+      - { port1: '1024', port2: '65535' }
+    loop_control:
+      label: "Adding ports to Sock Shop Policy"
+    ignore_errors: yes
+
+  - name: Add Ports to k8s-api to kwaf-ns
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ k8s_api_kwaf_ns_policy.object.id if k8s_api_kwaf_ns_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ port }}"
+        end_port: "{{ port }}"
+        state: present
+    loop:
+      - 443
+    loop_control:
+      loop_var: port
+      label: "Adding port {{ port }} to Sock Shop Policy"
+
+  - name: Add Policy kwaf-ns to kwaf-ns
+    tetration_application_policy:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id }}"
+        app_scope_id: "{{ application.object.app_scope_id }}"
+        provider_filter_name: kwaf-ns
+        consumer_filter_name: kwaf-ns
+        version: v0
+        rank: DEFAULT
+        policy_action: ALLOW
+        priority: 100
+        state: present
+    register: kwaf_ns_kwaf_ns_policy
+
+  - name: Add Ports to kwaf-ns to kwaf-ns
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ kwaf_ns_kwaf_ns_policy.object.id if kwaf_ns_kwaf_ns_policy else None }}"
+        version: v0
+        proto_name: TCP
+        start_port: "{{ item.port1 }}"
+        end_port: "{{ item.port2 }}"
+        state: present
+    loop:
+      - { port1: '1024', port2: '65535' }
+    loop_control:
+      label: "Adding ports to Sock Shop Policy"
+    ignore_errors: yes
+
+  - name: Add Ports to kwaf-ns to kwaf-ns
+    tetration_application_policy_ports:
+        provider:
+          server_endpoint: "{{ tetration_url }}"
+          api_key: "{{ api_key }}"
+          api_secret: "{{ api_secret }}"
+        app_id: "{{ application.object.id if application.object else None }}"
+        app_scope_id: "{{ application.object.app_scope_id if application.object else None }}"
+        policy_id: "{{ kwaf_ns_kwaf_ns_policy.object.id if kwaf_ns_kwaf_ns_policy else None }}"
         version: v0
         proto_name: TCP
         start_port: "{{ port }}"
