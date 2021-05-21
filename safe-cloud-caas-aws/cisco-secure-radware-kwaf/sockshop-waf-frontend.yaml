@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/instance: WAAS
     app.kubernetes.io/name: WAAS
-  namespace: sock-shop-prod
+  namespace: sock-shop
 spec:
   selector:
     matchLabels:
@@ -127,7 +127,7 @@ metadata:
     app.kubernetes.io/name: WAAS
     waas-prometheus-service: monitor
     name: front-end
-  namespace: sock-shop-prod
+  namespace: sock-shop
 spec:
   ports:
   - port: 80

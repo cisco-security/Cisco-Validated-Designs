@@ -2,7 +2,7 @@ apiVersion: waas.radware.com/v1beta1
 kind: Profile
 metadata:
   name: sock-shop-frontend-profile
-  namespace: sock-shop-prod
+  namespace: sock-shop
 spec:
   policies:
   - classifiers:
