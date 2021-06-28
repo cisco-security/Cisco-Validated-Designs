@@ -1,39 +1,27 @@
-# AWS VPC Infrastructure
-![alt text](https://github.com/amansin0504/aws-cloudnative-cvd/blob/main/aws-vpc-infrastructure/Images/AWS-Infra.png)
+# Azure Infrastructure
+![alt text](https://github.com/cisco-security/Cisco-Validated-Designs/blob/master/safe-cloud-caas-azure/images/Azure-Infra-0.svg)
 
-## AWS Resources:  
-This CloudFormation stack provisions following resources:   
-### Management VPC
-  - The VPC is spread across two availability zones - (CIDR - 10.10.0.0/16).
-  - Two public subnets - 10.10.10.0/24 in availability zone 1 and 10.10.20.0/24 in availability zone 2  
-  - Two private subnets - 10.10.11.0/24 in availability zone 1 and 10.10.21.0/24 in availability zone 2  
-  - NAT Gateways - One per availability zone for providing internet access to private subnets in each availability zone  
-  - Internet Gateway attached to VPC.  
-  - Private Route Tables - One for each availability zone with default route pointing to corresponding NAT Gateway.  
-  - Public Route Tables - One route table associate to public subnets, default route points to Internet Gateway.  
-  - Bastion hosts in each public subnet (installed with utilities awscli, eksctl, kubectl, helm, Git client).  
+## Azure Resources:  
+This Terraform code provisions following resources:   
+### Hub Resource Group
+  - Two Azure VNets - (CIDR - 10.10.0.0/16 and 10.11.0.0/16).
+  - UDR with appropriate routes
+  - Bastion host in VNet1 (installed with utilities awscli, eksctl, kubectl, helm, Git client).
+  - Virtual machine to install Duo Network Gateway (to be installed later)
+  - AKS cluster with 2 nodes to install a private Gitlab instance (to be installed later).
 
-### Staging VPC
-  - The VPC is spread across three availability zones - (CIDR - 10.20.0.0/16).  
-  - Three public subnets - 10.20.10.0/24, 10.20.20.0/24 and 10.20.30.0/24 in availability zones 1,2 and 3 respectively.  
-  - Three private subnets - 10.20.11.0/24, 10.20.21.0/24 and 10.20.31.0/24 in availability zones 1,2 and 3 respectively.  
-  - NAT Gateways - One per availability zone for providing internet access to private subnets in each availability zone.  
-  - Internet Gateway attached to VPC.  
-  - Private Route Tables - One for each availability zone with default route pointing to corresponding NAT Gateways.  
-  - Public Route Tables - One route table associate to public subnets, default route points to Internet Gateway.  
+### Spoke1 Resource Group
+  - Azure VNets - (CIDR - 10.20.0.0/16).
+  - UDR with appropriate routes
+  - AKS cluster with three nodes in three availability zones.
 
-### Production VPC
-  -  The VPC is spread across three availability zones - (CIDR - 10.30.0.0/16).  
-  - Three public subnets - 10.30.10.0/24, 10.30.20.0/24 and 10.30.30.0/24 in availability zones 1,2 and 3 respectively.  
-  - Three private subnets - 10.30.11.0/24, 10.30.21.0/24 and 10.30.31.0/24 in availability zones 1,2 and 3 respectively.  
-  - NAT Gateways - One per availability zone for providing internet access to private subnets in each availability zone.   
-  - Internet Gateway attached to VPC.  
-  - Private Route Tables - One for each availability zone with default route pointing to corresponding NAT Gateways.  
-  - Public Route Tables - One route table associate to public subnets, default route points to Internet Gateway.  
+### Spoke2 Resource Group
+  - Azure VNets - (CIDR - 10.20.0.0/16).
+  - UDR with appropriate routes
+  - AKS cluster with three nodes in three availability zones.
 
-### VPC Peering
-  - The template provisions a peering link between management VPC, staging VPC and management VPC, production VPC.
-  - It also adds the necessary routes required for communication between the management, staging and production VPCs.  
+### VNet Peering
+  - The template provisions VNet peering link between Hub VNet and Spoke Vnets.
 
 ## Steps to deploy:  
   - Upload all the files in this repo to an S3 bucket.  
