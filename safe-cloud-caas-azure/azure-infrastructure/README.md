@@ -4,7 +4,7 @@
 ## Azure Resources:  
 This Terraform code provisions following resources:   
 ### Hub Resource Group
-  - Two Azure VNets - (CIDR - 10.10.0.0/16 and 10.11.0.0/16).
+  - Azure VNets (CIDR - 10.10.0.0/16) with two subnets - (10.10.1.0/24 and 10.10.2.0/24).
   - UDR with appropriate routes
   - Bastion host in VNet1 (installed with utilities awscli, eksctl, kubectl, helm, Git client).
   - Virtual machine to install Duo Network Gateway (to be installed later)
@@ -24,8 +24,6 @@ This Terraform code provisions following resources:
   - The template provisions VNet peering link between Hub VNet and Spoke Vnets.
 
 ## Steps to deploy:  
-  - Upload all the files in this repo to an S3 bucket.  
-  - Navigate to CloudFormation > Create Stack and add the Amazon S3 URL for master template file (create-vpc-architecture-master.yaml).  
-  - Fill all the prompted details(include the name of S3 bucket with all the template files) and create the stack. The CloudFormation stack with deploy all the resources in a nested manner. A Sample run will look as below.  
+  - clone this repo and follow the terraform script as show in snapshot
 
 ![alt text](https://github.com/amansin0504/aws-cloudnative-cvd/blob/main/aws-vpc-infrastructure/Images/cfmstack.png)
