@@ -16,7 +16,7 @@ This Terraform code provisions following resources:
   - AKS cluster with three nodes in three availability zones.
 
 ### Spoke2 Resource Group
-  - Azure VNets - (CIDR - 10.20.0.0/16).
+  - Azure VNets - (CIDR - 10.30.0.0/16).
   - UDR with appropriate routes
   - AKS cluster with three nodes in three availability zones.
 
