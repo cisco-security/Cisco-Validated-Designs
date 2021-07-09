@@ -1,2 +1,23 @@
 # GCP file
 gcp.json
+safe-gcp-infrastructure/gcp.json
+
+# Local .terraform directories
+safe-gcp-infrastructure/.terraform/*
+
+# .tfstate files
+safe-gcp-infrastructure/*.tfstate
+safe-gcp-infrastructure/*.tfstate.*
+
+# Exclude all .tfvars files
+safe-gcp-infrastructure/*.tfvars
+
+# Ignore override files
+safe-gcp-infrastructure/override.tf
+safe-gcp-infrastructure/override.tf.json
+safe-gcp-infrastructure/*_override.tf
+safe-gcp-infrastructure/*_override.tf.json
+
+# Ignore CLI configuration files
+safe-gcp-infrastructure/.terraformrc
+safe-gcp-infrastructure/terraform.rc
