@@ -7,7 +7,7 @@ variable user {
 }
 
 variable password {
-    default = "w6KxCKmmCFdLB0rC"
+    type = string
 }
 
 variable dbname {
