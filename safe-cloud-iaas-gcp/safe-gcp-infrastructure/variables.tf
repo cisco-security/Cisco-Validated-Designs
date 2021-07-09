@@ -8,6 +8,7 @@ variable user {
 
 variable password {
     type = string
+    description = "SQL db Password"
 }
 
 variable dbname {
