@@ -1,0 +1,20 @@
+
+# Local .terraform directories
+azure-infrastructure/.terraform/*
+
+# .tfstate files
+azure-infrastructure/*.tfstate
+azure-infrastructure/*.tfstate.*
+
+# Exclude all .tfvars files
+azure-infrastructure/*.tfvars
+
+# Ignore override files
+azure-infrastructure/override.tf
+azure-infrastructure/override.tf.json
+azure-infrastructure/*_override.tf
+azure-infrastructure/*_override.tf.json
+
+# Ignore CLI configuration files
+azure-infrastructure/.terraformrc
+azure-infrastructure/terraform.rc
