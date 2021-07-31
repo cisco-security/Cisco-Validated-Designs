@@ -26,4 +26,4 @@ This Terraform code provisions following resources:
 ## Steps to deploy:  
   - clone this repo and follow the terraform script as show in snapshot
 
-![alt text](https://github.com/amansin0504/aws-cloudnative-cvd/blob/main/aws-vpc-infrastructure/Images/tfmoutput.png)
+![alt text](https://raw.githubusercontent.com/cisco-security/Cisco-Validated-Designs/master/safe-cloud-caas-azure/images/tfmoutput.png)
