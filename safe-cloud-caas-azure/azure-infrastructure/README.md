@@ -26,4 +26,4 @@ This Terraform code provisions following resources:
 ## Steps to deploy:  
   - clone this repo and follow the terraform script as show in snapshot
 
-![alt text](https://github.com/amansin0504/aws-cloudnative-cvd/blob/main/aws-vpc-infrastructure/Images/cfmstack.png)
+![alt text](https://github.com/amansin0504/aws-cloudnative-cvd/blob/main/aws-vpc-infrastructure/Images/tfmoutput.png)
