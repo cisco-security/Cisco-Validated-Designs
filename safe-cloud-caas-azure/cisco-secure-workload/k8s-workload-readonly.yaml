@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tetration-read-only
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tetration-read-only-role
+  namespace: default
+rules:
+- apiGroups:
+  - '*'
+  resources: ["bindings","componentstatuses","configmaps","endpoints","events","limitranges","namespaces","nodes","persistentvolumeclaims","persistentvolumes","pods","podtemplates","replicationcontrollers","resourcequotas","services","mutatingwebhookconfigurations","validatingwebhookconfigurations","customresourcedefinitions","apiservices","controllerrevisions","daemonsets","deployments","replicasets","statefulsets","localsubjectaccessreviews","selfsubjectaccessreviews","selfsubjectrulesreviews","subjectaccessreviews","horizontalpodautoscalers","cronjobs","jobs","leases","eniconfigs","events","daemonsets","deployments","ingresses","networkpolicies","podsecuritypolicies","replicasets","networkpolicies","poddisruptionbudgets","podsecuritypolicies","priorityclasses","storageclasses","volumeattachments"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: tetration-read-only-binding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tetration-read-only-role
+subjects:
+- kind: ServiceAccount
+  name: tetration-read-only
+  namespace: default
+

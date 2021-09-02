@@ -17,7 +17,7 @@ resource "azurerm_subnet" "Spoke1Subnet" {
     resource_group_name  = azurerm_resource_group.spoke1RG.name
     virtual_network_name = azurerm_virtual_network.Spoke1VNet.name
     address_prefixes       = ["10.20.1.0/24"]
-    enforce_private_link_service_network_policies = false
+    enforce_private_link_endpoint_network_policies = true
 }
 
 # Create AKS cluster
@@ -60,8 +60,8 @@ resource "azurerm_kubernetes_cluster" "spoke1k8s" {
     }
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "hublink" {
-  name                  = "hublink"
+resource "azurerm_private_dns_zone_virtual_network_link" "hubspoke1link" {
+  name                  = "hubspoke1link"
   resource_group_name   = "MC_${azurerm_resource_group.spoke1RG.name}_${azurerm_kubernetes_cluster.spoke1k8s.name}_${var.location.suffix}"
   private_dns_zone_name = join(".", slice(split(".", azurerm_kubernetes_cluster.spoke1k8s.private_fqdn), 1, length(split(".", azurerm_kubernetes_cluster.spoke1k8s.private_fqdn))))
   virtual_network_id    = azurerm_virtual_network.HubVNet.id

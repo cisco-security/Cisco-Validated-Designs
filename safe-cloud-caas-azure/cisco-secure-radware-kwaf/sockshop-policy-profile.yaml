@@ -1,0 +1,42 @@
+apiVersion: waas.radware.com/v1beta1
+kind: Profile
+metadata:
+  name: sock-shop-frontend-profile
+  namespace: sock-shop
+spec:
+  policies:
+  - classifiers:
+    - hostname: '*'
+      id: sockshopappclassifier
+      path:
+        operand: Prefix
+        value: /
+      protectionId: fullprotection
+    name: sockshopPolicy
+    operatorEmail: support@example.com
+    protections:
+    - activityTracking:
+        blockPeriod: 5m
+        countStatic: false
+        excludes: []
+        ignoreStaticWithParams: false
+        opMode: Bypass
+        rate: 5s
+      apiSecurity:
+        apiSpec: sock-shop-frontend-fullprotection
+        opMode: Active
+        openapiNamespace: sock-shop-prod
+      dlp:
+        opMode: Active
+        patterns:
+        - predefined: SSN
+      expressions:
+        opMode: Active
+      id: fullprotection
+      rfcValidation:
+        action: Block
+        report: Always
+      signatures:
+        opMode: Active
+      whitelist:
+        opMode: Bypass

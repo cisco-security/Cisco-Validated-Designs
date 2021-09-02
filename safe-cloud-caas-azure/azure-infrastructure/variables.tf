@@ -17,6 +17,14 @@ variable cluster_name {
     default = "spoke1akscluster"
 }
 
+variable WindowsBastionUser {
+    default = "azureuser"
+}
+
+variable WindowsBastionPassword {
+    default = "P@$$w0rd1234!"
+}
+
 variable location {
     type = map(string)
     default = {
