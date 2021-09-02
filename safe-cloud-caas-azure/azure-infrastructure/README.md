@@ -18,7 +18,7 @@ Follow the [link](https://docs.microsoft.com/en-us/azure/developer/terraform/sto
 ### VNet Peering
   - The template provisions VNet peering link between Hub VNet and Spoke VNets.
 
-### VNet Peering
+### Storage Accounts - Hub Resource Group
   - Azure Storage Accounts for storing NSG flow logs and lab files.
 
 ## Steps to deploy:  
