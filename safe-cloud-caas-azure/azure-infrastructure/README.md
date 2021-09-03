@@ -21,6 +21,9 @@ Follow the [link](https://docs.microsoft.com/en-us/azure/developer/terraform/sto
 ### Storage Accounts - Hub Resource Group
   - Azure Storage Accounts for storing NSG flow logs and lab files.
 
+### Azure Container registry - Hub Resource Group
+  - Azure Container registry for privately storing docker images.
+
 ## Steps to deploy:  
   - Clone this repository
   ```bash
@@ -33,7 +36,7 @@ Follow the [link](https://docs.microsoft.com/en-us/azure/developer/terraform/sto
   ```
 
 ### Output:
-![alt text](https://raw.githubusercontent.com/cisco-security/Cisco-Validated-Designs/master/safe-cloud-caas-azure/images/TerraformOutput.png)
+![alt text](https://raw.githubusercontent.com/cisco-security/Cisco-Validated-Designs/master/safe-cloud-caas-azure/images/TerraformApply.png)
 
 **_NOTE:_**  This repo contains terraform for single spoke resource group. If you wish to have two or more spokes then you can simply copy the spokes.tf as spokes1.tf, spokes2.tf...etc. and update the string 'spoke1' everywhere in the source with appropriate spoke name for example - replace spoke1RG and Spoke1VNet with spoke2RG and Spoke3VNet .
 
@@ -44,4 +47,4 @@ Follow the [link](https://docs.microsoft.com/en-us/azure/developer/terraform/sto
   ```
 
 ### Output:
-![alt text](https://raw.githubusercontent.com/cisco-security/Cisco-Validated-Designs/master/safe-cloud-caas-azure/images/TerraformOutput.png)
+![alt text](https://raw.githubusercontent.com/cisco-security/Cisco-Validated-Designs/master/safe-cloud-caas-azure/images/TerraformDestroy.png)

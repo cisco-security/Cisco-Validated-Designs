@@ -206,7 +206,7 @@ resource "azurerm_linux_virtual_machine" "gitlab" {
     location              = var.location.value
     resource_group_name   = azurerm_resource_group.hubRG.name
     network_interface_ids = [azurerm_network_interface.GitNic.id]
-    size                  = "Standard_DS1_v2"
+    size                  = "Standard_DS3_v2"
 
     os_disk {
         name              = "GitOsDisk"
@@ -240,7 +240,7 @@ resource "azurerm_linux_virtual_machine" "dng" {
     location              = var.location.value
     resource_group_name   = azurerm_resource_group.hubRG.name
     network_interface_ids = [azurerm_network_interface.DNGNic.id]
-    size                  = "Standard_DS2_v2"
+    size                  = "Standard_DS3_v2"
 
     os_disk {
         name              = "DNGOsDisk"
@@ -296,12 +296,12 @@ resource "azurerm_linux_virtual_machine" "WorkloadConnector" {
         public_key     = tls_private_key.vm_ssh.public_key_openssh
     }
 }
-# Create Linux virtual machine(Bastion Host)
+# Create Linux virtual machine(Bastion Linux Host)
 data "template_file" "bastion-init" {
   template = file("bastion-user-data.sh")
 }
 resource "azurerm_linux_virtual_machine" "bastion" {
-    name                  = "Bastion"
+    name                  = "BastionLinux"
     location              = var.location.value
     resource_group_name   = azurerm_resource_group.hubRG.name
     network_interface_ids = [azurerm_network_interface.BastionNic.id]
@@ -331,7 +331,7 @@ resource "azurerm_linux_virtual_machine" "bastion" {
     }
 }
 
-# Create Windows virtual machine(Bastion Host)
+# Create Windows virtual machine(Bastion Windows Host)
 resource "azurerm_windows_virtual_machine" "bastionWin" {
   name                = "BastionWin"
   resource_group_name = azurerm_resource_group.hubRG.name
