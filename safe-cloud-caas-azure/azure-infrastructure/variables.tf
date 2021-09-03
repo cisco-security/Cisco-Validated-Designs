@@ -32,3 +32,7 @@ variable location {
       suffix = "centralus"
     }
 }
+
+variable containerregistry {
+    description = "A unique name for container regsitry - ex- safeapp0302"
+}

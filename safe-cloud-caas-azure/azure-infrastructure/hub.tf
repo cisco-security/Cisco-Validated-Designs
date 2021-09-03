@@ -382,15 +382,11 @@ resource "azurerm_storage_account" "stealtchwatch-hub-ngsflowlogs" {
   }
 }
 
-# Create Storage Account for Tetration Lab files
-resource "azurerm_storage_account" "tetration-hub-labfiles" {
-  name                     = "labfilessecurecloud"
+# Create Container Registry
+resource "azurerm_container_registry" "acr" {
+  name                     = var.containerregistry
   resource_group_name      = azurerm_resource_group.hubRG.name
   location                 = azurerm_resource_group.hubRG.location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
-
-  tags = {
-    environment = "Hub"
-  }
+  sku                      = "Basic"
+  admin_enabled            = true
 }

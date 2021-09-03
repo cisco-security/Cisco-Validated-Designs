@@ -32,7 +32,16 @@ Follow the [link](https://docs.microsoft.com/en-us/azure/developer/terraform/sto
   terraform apply
   ```
 
-## Output:
+### Output:
 ![alt text](https://raw.githubusercontent.com/cisco-security/Cisco-Validated-Designs/master/safe-cloud-caas-azure/images/TerraformOutput.png)
 
 **_NOTE:_**  This repo contains terraform for single spoke resource group. If you wish to have two or more spokes then you can simply copy the spokes.tf as spokes1.tf, spokes2.tf...etc. and update the string 'spoke1' everywhere in the source with appropriate spoke name for example - replace spoke1RG and Spoke1VNet with spoke2RG and Spoke3VNet .
+
+## Clean Up:
+  - Delete the Azure resources
+  ```bash
+  terraform destroy
+  ```
+
+### Output:
+![alt text](https://raw.githubusercontent.com/cisco-security/Cisco-Validated-Designs/master/safe-cloud-caas-azure/images/TerraformOutput.png)
