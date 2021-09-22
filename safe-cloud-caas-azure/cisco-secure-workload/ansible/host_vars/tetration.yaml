@@ -1,0 +1,21 @@
+---
+# URL for the Tetration Dashboard
+tetration_url: "https://update-tetration-url-here"
+
+# API Details - Create new token from Tetration Dashboard!
+api_key: "<update-api-key-here>"
+api_secret: "<update-api-secret-here"
+
+# Set to true for production setups that use trusted certificates!
+validate_certs: true
+
+# specific details for the tetration app env
+app_scope_name: "<update-app-scope-name-here>"
+external_orchestrator_name_k8s: "staging-eks"
+k8s_namespace: "sock-shop"
+
+#Cluster Specific details
+K8S_CONTROL_PRIVATE_IP_ADDRESSES: "10.20.0.0/16"
+ELB_HEALTH_MONITOR_IP_ADDRESSES: "10.20.0.0/16"
+K8S_API_IP_ADDRESSES: "10.20.0.0/16"
+ELB_HEALTH_MONITOR_PORT: "<health-monitor-port>"

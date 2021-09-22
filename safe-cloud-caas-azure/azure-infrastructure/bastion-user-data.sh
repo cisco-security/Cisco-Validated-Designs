@@ -14,3 +14,5 @@ sudo apt-add-repository ppa:git-core/ppa
 sudo apt-get update
 sudo apt-get -y install git
 git clone https://github.com/cisco-security/Cisco-Validated-Designs.git /home/azureuser/Cisco-Validated-Designs
+
+sudo apt install jq

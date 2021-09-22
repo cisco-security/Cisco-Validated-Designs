@@ -35,7 +35,7 @@ output "DuoNetworkGatewayHostIP" {
 }
 
 output "SecureWorkloadConnectorIP" {
-    value = azurerm_linux_virtual_machine.WorkloadConnector.public_ip_address
+    value = azurerm_linux_virtual_machine.WorkloadConnector.private_ip_address
 }
 
 output "BastionLinuxHostIP" {
@@ -69,7 +69,7 @@ output "RegistryLogin" {
     value       = azurerm_container_registry.acr.login_server
 }
 output "RegistryUser" {
-    value       = azurerm_container_registry.acr.admin_username 
+    value       = azurerm_container_registry.acr.admin_username
 }
 output "RegistryPassword" {
     value       = azurerm_container_registry.acr.admin_password
