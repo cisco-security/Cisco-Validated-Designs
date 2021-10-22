@@ -1,6 +1,7 @@
 
 # Local .terraform directories
 azure-infrastructure/.terraform/*
+azure-infrastructure/*.pem
 
 # .tfstate files
 azure-infrastructure/*.tfstate
