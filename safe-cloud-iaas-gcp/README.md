@@ -3,4 +3,4 @@ SAFE can help you simplify your security strategy and deployment. This Cisco sec
 
 SAFE solutions have been deployed, tested, and validated at Cisco and provide guidance, best practices, and configuration steps.
 
-# This design is a work in progress
+# This design guide is a work in progress
