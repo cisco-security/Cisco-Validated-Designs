@@ -1,19 +1,11 @@
-sudo yum install -y wget
-sudo yum install -y unzip
-sudo yum install -y lsof
-sudo yum install -y ipset
-sudo yum install -y httpd
-sudo yum install -y rsync
-sudo systemctl start httpd
-sudo systemctl enable httpd
-
 sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 sudo yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm
-sudo yum -y install yum-utils
+sudo yum -y update
+sudo yum install -y wget unzip lsof ipset httpd rsync yum-utils
 sudo yum-config-manager --enable remi-php74
-sudo yum update
-sudo yum -y install php php-cli
-sudo yum -y install php  php-cli php-fpm php-mysqlnd php-zip php-devel php-gd php-mcrypt php-mbstring php-curl php-xml php-pear php-bcmath php-json
+sudo yum -y install php php-cli php-fpm php-mysqlnd php-zip php-devel php-gd php-mcrypt php-mbstring php-curl php-xml php-pear php-bcmath php-json
+sudo systemctl start httpd
+sudo systemctl enable httpd
 
 sudo setsebool -P httpd_can_network_connect 1
 
