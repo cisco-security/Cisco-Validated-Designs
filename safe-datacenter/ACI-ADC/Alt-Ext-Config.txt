@@ -1,0 +1,358 @@
+script start "Alteon Application Switch 7612nxc S" 4  /**** DO NOT EDIT THIS LINE!
+/* md5sum 89a9b5c6d9f26374b740fcf385a86707*/
+/* Configuration dump taken 10:18:08 Thu Dec 16, 2021
+/* Configuration last applied at 00:12:26 Tue Nov  9, 2021
+/* Configuration last save at 00:14:43 Tue Nov  9, 2021
+/* Version 32.6.3.0,  Base MAC address 2c:b6:93:6e:54:00, RAM 96 GB
+/c/sys/mmgmt/net 1
+	addr 10.16.1.104
+	mask 255.255.255.0
+	broad 10.16.1.255
+	gw 10.16.1.1
+	ena
+/c/sys/mmgmt
+/c/sys/mmgmt/net 1/port
+	speed any 
+	mode any 
+	auto on 
+/c/sys/ntp
+	on
+	prisrv 10.9.255.1
+/c/sys/resources
+	awcores 2
+/c/sys
+	idle 7000
+/c/sys/access
+	snmp w
+/c/sys/access/user
+	admpw "17d440b097e31efd6d46acf8b0cfb5593ae8b62417147607ad29754cc728aee13b398f98e86fc9b5f172ac395cc4634d7ef91df98ada76738faf20e68a7a64e5aYEDTJgkMTUOHpLemCodcbhlWxVLvIvkv"
+/c/sys/ssnmp
+	auth ena
+/c/port 7 
+	tag ena
+	pvid 1193
+/c/port 8 
+	tag ena
+	pvid 1193
+/c/port 9 
+	tag ena
+	pvid 1194
+/c/port 10
+	tag ena
+	pvid 1194
+/c/l2/vlan 1193
+	ena
+	name "Inside"
+	learn ena
+	def 7 8
+/c/l2/vlan 1194
+	ena
+	name "Outside"
+	learn ena
+	def 9 10
+/c/l2/stg 1/clear
+/c/l2/stg 1/add 1 1193-1194
+/c/l2/lacp
+	name "LACP"
+/c/l2/lacp/port 7 
+	mode passive
+/c/l2/lacp/port 8 
+	mode passive
+	adminkey 7
+/c/l2/lacp/port 9 
+	mode passive
+/c/l2/lacp/port 10
+	mode passive
+	adminkey 9
+/c/sys/access/sshd/sshv1 dis
+/c/sys/access/sshd/on
+/c/l3/ospf/on
+/c/l3/ospf/aindex 1
+	ena
+	areaid 0.0.0.1
+	type stub
+	metric 1
+	auth none
+	spf 10
+/c/l3/ospf/if 2
+	ena
+	aindex 1
+	prio 1
+	cost 1
+	hello 10
+	dead 40
+	trans 1
+	retra 5
+	bfd off
+/c/l3/ospf/host 1
+	ena
+	addr 10.22.92.11
+	aindex 1
+	cost 1
+/c/l3/
+	rtrid 10.16.94.11
+/c/l3/if 1
+	ena
+	ipver v4
+	addr 10.16.93.11
+	mask 255.255.255.0
+	broad 10.16.93.255
+	vlan 1193
+	descr "Inside"
+/c/l3/if 2
+	ena
+	ipver v4
+	addr 10.16.94.11
+	mask 255.255.255.0
+	broad 10.16.94.255
+	vlan 1194
+	descr "Outside"
+/c/l3/gw 1
+	ena
+	ipver v4
+	addr 10.16.94.1
+/c/l3/route/ip4
+	add 10.18.201.0 255.255.255.0 10.16.93.1
+	add 10.21.90.11 255.255.255.255 10.16.93.1
+	add 10.22.91.11 255.255.255.255 10.16.93.1
+/c/sys/ssnmp/snmpv3/taddr 1
+	name "v1v2trap1"
+	addr 10.9.10.120
+	taglist "v1v2param1"
+	pname "v1v2param1"
+/c/sys/ssnmp/snmpv3/tparam 1
+	name "v1v2param1"
+	mpmodel snmpv1
+	uname "v1v2only"
+	model snmpv1
+/c/sys/ssnmp/snmpv3/notify 1
+	name "v1v2Trap1"
+	tag "v1v2param1"
+/c/sys/ssnmp/snmpv3/comm 1
+	index "trapComm1"
+	name "public"
+	uname "v1v2only"
+/c/slb/accel/compress
+	on
+/c/slb/ssl/certs/key ALT-Ext-Cert
+/c/slb/ssl/certs/key ALT-Ext-Key
+/c/slb/ssl/certs/key WebManagementCert
+/c/slb/ssl/certs/request ALT-Ext-Cert
+/c/slb/ssl/certs/import request "ALT-Ext-Cert" text
+-----BEGIN CERTIFICATE REQUEST-----
+MIICXzCCAUcCAQAwGjEYMBYGA1UEAwwPd2ViLmNpc2NvLXguY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsoiJQGJ4Y0yLx4uve9M3Fn4O6NXSGVVG
+UgR1m1z2b0XwZB+N7lqFqXmBeTTmQm2Ppp/9i6tT8Qw+Y9JHLUe84zfCLgWe4e+T
+Wc7Y2bZvZJPC04VNS324zjV1/yvctZLcufrWX1J7d2o0aCYdnuZbRUgKCHSJBL/m
+6UQwZmqtabs++GFADCYF7ijG1DJw9uAn8locszCucTspBqJrXu0meemiLtke375p
+eqPKons3+m2GaKgXbzcqX+zVw/IcUpQLIJfngG+Ooe3yXMZxxSLJ29TW/RiMx425
+Iui56m7XVoDZ22spzHK7UFRhvCFaZ0IVG/ZZJCYihvLhgN7OqsQh8QIDAQABoAAw
+DQYJKoZIhvcNAQELBQADggEBAKNWLVM21e1qIKsdLLZGKMECV280vssaIXrmXfj0
+kBrQxeRTpaFm7mqhRQ+Mn9Qx//UcWW8FLztDx+6GSzuKn52FwbN2TEwOQ+oP+0Am
+f5P7OmjGyTFsufBXY5JJLb4sAae4+1x0AdFkfOTGUnLxweqX2UsZNdhK7aLnaRAL
+Tv4+dNVq69UqNKTVHxaBBX25BTOD/zSo/QBtPLFaQO1o6VOBDUfI2Yv93ZxdoWEb
+ckorHIUFcdqor3N0Xl8s0xuAfzEWQT8ySZP9xXHM0lrnHlYVmv0bOD+10n0R+u8E
+NKjG/udkHYuUJEmpmVcgWgd9Fx+6mQBJBFmGtIo724ZhZig=
+-----END CERTIFICATE REQUEST-----
+
+/c/slb/ssl/certs/request WebManagementCert
+/c/slb/ssl/certs/import request "WebManagementCert" text
+-----BEGIN CERTIFICATE REQUEST-----
+MIICcTCCAVkCAQAwLDEqMCgGA1UEAwwhRGVmYXVsdF9HZW5lcmF0ZWRfQWx0ZW9u
+X0JCSV9DZXJ0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx4PeeuIx
+ixsT7f/nIFADut+s6Nnd5BawgEjgaBb4PVOxG/bEKPLh3ug0LcgPn6mC1jfNz9Tu
+cRtlBh5EH9aqj8EHplZwF1smd9nG28IfF3N44Csed6aB45wlsCHt7vPOrJVt757z
+j7/RXAjWIX4026MZvN//auji35OP2UF3BDo6JdOwqWxYD8XSrIoRwEKsHGH7RY1u
+qhxqRVZjjT7fZSgkUdwzu+u/iRY/hxjazZP8YC2471P5xDJ1YZ5xVgfL3ulhp6BX
+8PntKrk7+P3COv72DcilRnFF8pTs36I00ft4IiYHj1Z9TGVTmhiUkpwaXGgwBMmi
+6nzkgxkDpsKTnQIDAQABoAAwDQYJKoZIhvcNAQELBQADggEBAHhg8y0bnTKZMlei
+umssHvQR0h3/XAyzqhYYz/kUT8dur+QR3avoN0a2PPlc97I4YRaxp4ax+n4AjhOm
+FyRGXck5pq9t4pHGQz8pvDru+JuzRZLZUw+S/nFBWrnBCCyLh5B1uTCEb8XvkY46
+2RZh2R6dHsC5P8vUmaImQW/IWAWR5WYUe+iGLhAzBnlknOszWGp1Sm96J5ZF8OMi
+unmyVmwXfoiZelm9U9bThsiro/cjaKfYxxx+3VgHeYSpjF+xEMgVRi8xZBGfuBoA
+G+/9jhgat+YrW3Tam0WkcxrQiFP3eVyfyQxj3xXI7teII+cpARwat9cl6TLncQJF
+cFxF7pY=
+-----END CERTIFICATE REQUEST-----
+
+/c/slb/ssl/certs/cert ALT-Ext-Cert
+/c/slb/ssl/certs/import cert "ALT-Ext-Cert" text
+-----BEGIN CERTIFICATE-----
+MIIDgjCCAmqgAwIBAgIEYLnzlzANBgkqhkiG9w0BAQsFADAaMRgwFgYDVQQDDA93
+ZWIuY2lzY28teC5jb20wHhcNMjEwNjA0MDk1NTM2WhcNMjIwNjA0MDk1NTM2WjAa
+MRgwFgYDVQQDDA93ZWIuY2lzY28teC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCyiIlAYnhjTIvHi6970zcWfg7o1dIZVUZSBHWbXPZvRfBkH43u
+WoWpeYF5NOZCbY+mn/2Lq1PxDD5j0kctR7zjN8IuBZ7h75NZztjZtm9kk8LThU1L
+fbjONXX/K9y1kty5+tZfUnt3ajRoJh2e5ltFSAoIdIkEv+bpRDBmaq1puz74YUAM
+JgXuKMbUMnD24CfyWhyzMK5xOykGomte7SZ56aIu2R7fvml6o8qiezf6bYZoqBdv
+Nypf7NXD8hxSlAsgl+eAb46h7fJcxnHFIsnb1Nb9GIzHjbki6LnqbtdWgNnbaynM
+crtQVGG8IVpnQhUb9lkkJiKG8uGA3s6qxCHxAgMBAAGjgc8wgcwwDwYDVR0TAQH/
+BAUwAwEB/zARBglghkgBhvhCAQEEBAMCAkQwMwYJYIZIAYb4QgENBCYWJEFsdGVv
+bi9SYWR3YXJlIEdlbmVyYXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUAZwZ6VJr
+0KZwqoNbC+MqlOHBsIowRQYDVR0jBD4wPIAUAZwZ6VJr0KZwqoNbC+MqlOHBsIqh
+HqQcMBoxGDAWBgNVBAMMD3dlYi5jaXNjby14LmNvbYIEYLnzlzALBgNVHQ8EBAMC
+AuwwDQYJKoZIhvcNAQELBQADggEBAIfw0PMcEX1p6ckX1uZezlSyelrWIDWmgaGW
+CLhcyS0GtBs88uzNyT2NgmvkxhuJwD8wzGCQAaMIDEqKVCVCCtEJJbLOysKtLvtk
+Vh/kYws3+1GXZbgI3cY+UzqeGoUrZmlMt45Ib198ehfbo1TeF06B4ePH4U5REHGr
+NT4TY+GvdfmQaM9AkFvaVpxgM5mHH0zVwF8ErrVkWi/Pd9G8SEmFKAy2KOZ32Egz
+yUQHMSKcisaYK7uryQPSBkOHmc9kzMcU+YF0nKs+l9BpheElYRb0dd2CvUHMLwhY
+DfT6Ndmi+O4Pg9XSJrCVHmEPCNUogfBtywkyrlqnDV4XHOd1Agg=
+-----END CERTIFICATE-----
+
+/c/slb/ssl/certs/cert WebManagementCert
+/c/slb/ssl/certs/import cert "WebManagementCert" text
+-----BEGIN CERTIFICATE-----
+MIIDuDCCAqCgAwIBAgIEYKb2fDANBgkqhkiG9w0BAQsFADAsMSowKAYDVQQDDCFE
+ZWZhdWx0X0dlbmVyYXRlZF9BbHRlb25fQkJJX0NlcnQwHhcNMjEwNTIwMjM1MzMy
+WhcNMjIwNTIwMjM1MzMyWjAsMSowKAYDVQQDDCFEZWZhdWx0X0dlbmVyYXRlZF9B
+bHRlb25fQkJJX0NlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDH
+g9564jGLGxPt/+cgUAO636zo2d3kFrCASOBoFvg9U7Eb9sQo8uHe6DQtyA+fqYLW
+N83P1O5xG2UGHkQf1qqPwQemVnAXWyZ32cbbwh8Xc3jgKx53poHjnCWwIe3u886s
+lW3vnvOPv9FcCNYhfjTboxm83/9q6OLfk4/ZQXcEOjol07CpbFgPxdKsihHAQqwc
+YftFjW6qHGpFVmONPt9lKCRR3DO767+JFj+HGNrNk/xgLbjvU/nEMnVhnnFWB8ve
+6WGnoFfw+e0quTv4/cI6/vYNyKVGcUXylOzfojTR+3giJgePVn1MZVOaGJSSnBpc
+aDAEyaLqfOSDGQOmwpOdAgMBAAGjgeEwgd4wDwYDVR0TAQH/BAUwAwEB/zARBglg
+hkgBhvhCAQEEBAMCAkQwMwYJYIZIAYb4QgENBCYWJEFsdGVvbi9SYWR3YXJlIEdl
+bmVyYXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUpFFOazHtzswPXCnLJWeEMyGx
+Jr8wVwYDVR0jBFAwToAUpFFOazHtzswPXCnLJWeEMyGxJr+hMKQuMCwxKjAoBgNV
+BAMMIURlZmF1bHRfR2VuZXJhdGVkX0FsdGVvbl9CQklfQ2VydIIEYKb2fDALBgNV
+HQ8EBAMCAuwwDQYJKoZIhvcNAQELBQADggEBABHZwVRHDj5cCFN3KsgHb8LnVUAl
+dYxNLDrAZktUOJSd45rHSyB+52bQs2Fnus2g/ggGnH0vn2X78OqHhzMfUMRQgqM6
+fHNvSzl9MkSE5DHILvXpP7O8soJzBUGXqeUuLiQ2sQsJjye2Bq6zlkXGRdvNSU1Y
+HPldG53blKT5cU0g5Attp6RYxaraO2nsIshoR7Q0MzomZ5TmZts62oT3cBDalZHO
+gTn8HAAt5y/lanlQywcb+cZVNmwfiEp2j8lSKdw9562zLzBW3O0NNWVh/qpRXrSa
+U+DeOlaL/M6ECLPLZxe/HdPBrWuVpqrcPhNTxAJpBs1ssZbC+ODVzVve4Ts=
+-----END CERTIFICATE-----
+
+/c/slb/ssl
+	on
+/c/slb/ssl/sslpol Outbound_FE_SSL_Inspection
+	name "Outbound Frontend SSL Inspection"
+	convert disabled
+	ena
+/c/slb/ssl/sslpol Outbound_BE_SSL_Inspection
+	name "Outbound Backend SSL Inspection"
+	convert disabled
+	fessl disabled
+	ena
+/c/slb/ssl/sslpol Outbound_BE_SSL_Inspection/backend
+	ssl enabled
+/c/slb/accel/caching
+	off
+/c/security/websec
+	appwall ena
+/c/security/websec/secwa Payment_ID
+	name "Payment"
+	ena
+	appwall ena
+	mode inline
+/c/slb
+	on
+/c/slb/adv
+	direct ena
+	vstat ena
+	submac "ena"
+/c/slb/real ALT-Int-VIP1
+	ena
+	ipver v4
+	rip 10.22.91.11
+	name "Inside Alteon VIP"
+/c/slb/group Inside-ALT-Grp
+	ipver v4
+	health icmp
+	add ALT-Int-VIP1
+/c/slb/port "1"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "2"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "3"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "4"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "5"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "6"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "7"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "8"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "9"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "10"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "11"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "12"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "13"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "14"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "15"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "16"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "17"
+	client ena
+	server ena
+	proxy ena
+/c/slb/port "18"
+	client ena
+	server ena
+	proxy ena
+/c/slb/virt ALT-EXT-VIP
+	ena
+	ipver v4
+	vip 10.22.92.11
+	vname "Outside Alteon VIP1"
+/c/slb/virt ALT-EXT-VIP/service 443 https
+	applicid "VIP1:443"
+	group Inside-ALT-Grp
+	rport 80
+	dbind forceproxy
+/c/slb/virt ALT-EXT-VIP/service 443 https/http
+	secwa Payment_ID
+/c/slb/virt ALT-EXT-VIP/service 443 https/ssl
+	srvrcert cert ALT-Ext-Cert
+	sslpol Outbound_FE_SSL_Inspection
+/c/slb/virt ALT-EXT-VIP/service 443 https/pip
+	mode disable
+/c/slb/gslb
+	off
+	hostlk ena
+/c/sys/access/https/cert WebManagementCert
+/c/sys/access/https/https e
+/
+script end  /**** DO NOT EDIT THIS LINE!
