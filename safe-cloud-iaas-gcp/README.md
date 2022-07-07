@@ -3,6 +3,6 @@ SAFE can help you simplify your security strategy and deployment. This Cisco sec
 
 SAFE solutions have been deployed, tested, and validated at Cisco and provide guidance, best practices, and configuration steps.
 
-Check out the design guide [Secure Cloud for GCP](https://www.cisco.com/c/dam/en/us/solutions/collateral/enterprise/design-zone-security/). 
+Check out the design guide [Secure Cloud for GCP](https://www.cisco.com/c/en/us/solutions/collateral/enterprise/design-zone-security/scloud-gcp-design-guide.html). 
 
 For the Terraform templates, please check the safe-gcp-infrastructure directory in this repo.
