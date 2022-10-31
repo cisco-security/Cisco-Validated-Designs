@@ -36,6 +36,7 @@ This CloudFormation stack provisions following resources:
   - It also adds the necessary routes required for communication between the management, staging and production VPCs.  
 
 ## Steps to deploy:  
+  - Request additional Elastic IP Addresses for the region being used in AWS. 5 is the current maximum without a ticket requesting more (11 needed if template is unmodified)
   - Upload all the files in this repo to an S3 bucket.  
   - Navigate to CloudFormation > Create Stack and add the Amazon S3 URL for master template file (create-vpc-architecture-master.yaml).  
   - Fill all the prompted details(include the name of S3 bucket with all the template files) and create the stack. The CloudFormation stack with deploy all the resources in a nested manner. A Sample run will look as below.  
