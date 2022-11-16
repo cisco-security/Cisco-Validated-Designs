@@ -1,5 +1,6 @@
 # Azure Infrastructure
-![azure-topo](https://user-images.githubusercontent.com/10239022/202280924-bc697739-c6e0-471a-a6d6-eb564ab11e1d.svg)
+![Azure - Azure-Infra](https://user-images.githubusercontent.com/10239022/202281337-fae16eaa-e0d9-44f7-ba03-e4309c518c4b.svg)
+
 
 
 ## Azure Resources:  
