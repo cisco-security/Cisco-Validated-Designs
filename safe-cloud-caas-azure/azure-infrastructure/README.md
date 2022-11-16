@@ -1,5 +1,6 @@
 # Azure Infrastructure
-![alt text](https://github.com/cisco-security/Cisco-Validated-Designs/blob/master/safe-cloud-caas-azure/images/Azure-Infra-0.svg)
+![azure-topo](https://user-images.githubusercontent.com/10239022/202280924-bc697739-c6e0-471a-a6d6-eb564ab11e1d.svg)
+
 
 ## Azure Resources:  
 Follow the [link](https://docs.microsoft.com/en-us/azure/developer/terraform/store-state-in-azure-storage?tabs=terraform#2-configure-remote-state-storage-account) to do the initial set up for provisioning Azure resources using Terraform. This Terraform code provisions following resources:  
